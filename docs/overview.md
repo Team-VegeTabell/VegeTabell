@@ -50,6 +50,9 @@
 | 商品出品（商品名・価格・期限・写真） | 売り手 |
 | 商品一覧表示 | 買い手 |
 | 予約機能（店頭払い） | 買い手 |
+| 通知機能（予約確定・新着出品・期限間近など） | 両者 |
+
+※通知機能は必須機能とする（詳細は[functional-requirements.mdの「6. 通知」](./functional-requirements.md#6-通知)、テーブル定義は[db-design.mdのnotifications](./db-design.md#notifications通知)を参照）
 
 ---
 
