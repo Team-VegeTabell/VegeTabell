@@ -29,7 +29,7 @@
 - [x] Step1: Supabase上に`db-design.md`通りのテーブルをSQLで作成（Supabase MCPの`apply_migration`で適用済み） (完了: 2026-09-07)
 - [x] Step2: Entity・Repository実装（6 Entity + 6 Repository + enum/Converter、`ddl-auto=validate`通過、`CategoryRepositoryTest`で実DBからのデータ取得を確認） (完了: 2026-09-07)
 - [x] Step3: Spring Security設定（`SecurityConfig`/`CustomUserDetailsService`/ログイン時ロール一致チェック、auth-design.md §2の認可マトリクス実装、テスト6クラス16件で検証） (完了: 2026-09-07)
-- [ ] Step4: 会員登録・ログイン画面
+- [x] Step4: 会員登録・ログイン画面（`AuthController`/`SignupForm`/`SignupService`、`/login`・`/signup`テンプレート、テスト8クラス28件で検証。実DB(Supabase)への登録・ログイン・ロール不一致・ログアウトも手動確認済み） (完了: 2026-09-07)
 - [ ] Step5: 売り手：商品出品機能
 - [ ] Step6: 買い手：商品一覧・詳細
 - [ ] Step7: 予約機能・キャンセル
@@ -113,6 +113,12 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - ログインフォームは`username`（＝email）・`password`に加えて、買い手/売り手トグル用に**`role`という名前**のフィールドを送信すること（`buyer`または`seller`の小文字。`RoleMatchAuthenticationSuccessHandler`が参照する）
 - 通常のメール/パスワード間違い（`/login?error`）と、ロール不一致（`/login?error=role`）は**パラメータ値に関わらず表示文言を完全に同じ**にすること（「メールアドレス、パスワード、またはアカウント種別が正しくありません」）。どちらが誤りかをUI側で分岐して教えない
 - `SecurityConfig`は`.loginPage("/login")`を明示指定しているため、Spring Securityの自動生成ログインページは使われない。Step4で`/login`にGETで表示用のController/テンプレートを実装するまでは`/login`は404になる（意図した状態）
+
+### Step4実装時に発見・対処した点
+
+- `auth-design.md`の認可表は`/`を`ROLE_BUYER`限定としているが、`api-design.md`は「`/`はログイン後roleに応じて`/products`または`/seller/dashboard`へリダイレクト」としており、売り手が直接ログインすると（保存済みリクエストが無い場合のデフォルト遷移先が`/`のため）即403になってしまう矛盾があった。`SecurityConfig`の認可設定（`/`はBUYER限定のまま）には手を入れず、`RoleMatchAuthenticationSuccessHandler`のログイン成功後デフォルト遷移先をロールに応じて`/`（買い手）／`/seller/dashboard`（売り手）に振り分けるよう修正して解決した（売り手を`/`に送らないようにすることで両ドキュメントを両立）
+- 上記修正にあたり、`RoleMatchAuthenticationSuccessHandler`（シングルトンBean）が`SavedRequestAwareAuthenticationSuccessHandler`をインスタンスフィールドとして使い回していたため、同時ログイン時にリダイレクト先設定が競合するおそれがあった。リクエストごとにローカルインスタンスを生成する形に修正済み
+- `/`・`/products`・`/seller/dashboard`はまだControllerが無いため、ログイン直後のリダイレクトは404になる（Step5/6でController実装まで想定通り）
 
 ---
 

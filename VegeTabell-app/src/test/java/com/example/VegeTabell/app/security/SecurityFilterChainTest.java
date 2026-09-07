@@ -36,11 +36,8 @@ class SecurityFilterChainTest {
 
     @Test
     void loginPageIsNotBlockedByAuthentication() throws Exception {
-        // .loginPage("/login") を明示指定するとSpring Securityの自動生成ログインページは無効になるため、
-        // Controller未実装の現時点（Step4前）では404が正しい。もしpermitAllが効いていなければ
-        // 認証要求で /login 自身にリダイレクトされ続けるはずなので、404はSecurity層を通過した証拠になる。
-        // Step4でログイン画面のControllerを実装したら、この期待値は isOk() に更新すること。
+        // Step4でAuthController#loginを実装したため、200が正しい期待値になった。
         mockMvc.perform(get("/login"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 }

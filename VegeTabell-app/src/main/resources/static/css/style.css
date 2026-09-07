@@ -1,0 +1,189 @@
+/* VegeTabell 共通ベーススタイル（design/wireframes/login-signup.png準拠） */
+
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-muted: #8a8a8a;
+  --color-border: #e0e0e0;
+  --color-field-bg: #f5f5f5;
+  --color-pill-bg: #eeeeee;
+  --color-pill-selected-bg: #e0e0e0;
+  --color-button-bg: #e5e5e5;
+  --color-button-text: #1a1a1a;
+  --color-error: #c0392b;
+  --color-success: #2e7d32;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.auth-page {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.auth-logo {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 16px;
+  border-radius: 24px;
+  background: var(--color-field-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.auth-tagline {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 14px;
+  margin: 0 0 32px;
+}
+
+/* 買い手/売り手のピル型トグル */
+.role-toggle {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 24px;
+  background: var(--color-pill-bg);
+}
+
+.role-toggle input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.role-toggle label {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.role-toggle input[type="radio"]:checked + label {
+  background: var(--color-pill-selected-bg);
+  color: var(--color-text);
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="number"],
+.field textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  font-size: 15px;
+}
+
+.field-error {
+  color: var(--color-error);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.seller-fields[hidden] {
+  display: none;
+}
+
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-button-bg);
+  color: var(--color-button-text);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.auth-link-muted {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 13px;
+  margin: 32px 0 16px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--color-border);
+}
+
+.auth-footer-link {
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-footer-link a {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.auth-message {
+  text-align: center;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.auth-message.success {
+  background: #eaf6ea;
+  color: var(--color-success);
+}
+
+.auth-message.error {
+  background: #fbeceb;
+  color: var(--color-error);
+}
