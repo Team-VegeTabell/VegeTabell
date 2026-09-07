@@ -7,6 +7,7 @@ import com.example.VegeTabell.app.entity.User;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.entity.type.UserRole;
 import com.example.VegeTabell.app.repository.CategoryRepository;
+import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
 import com.example.VegeTabell.app.repository.ReservationRepository;
 import com.example.VegeTabell.app.repository.ShopRepository;
@@ -60,6 +61,9 @@ class SellerControllerTest {
 
     @MockitoBean
     private ReservationRepository reservationRepository;
+
+    @MockitoBean
+    private NotificationRepository notificationRepository;
 
     private Shop shopOwnedBySeller(long shopId, long sellerUserId) {
         User seller = new User();

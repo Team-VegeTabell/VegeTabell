@@ -8,6 +8,7 @@ import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.entity.type.ReservationStatus;
 import com.example.VegeTabell.app.form.ProductForm;
 import com.example.VegeTabell.app.repository.CategoryRepository;
+import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
 import com.example.VegeTabell.app.repository.ReservationRepository;
 import com.example.VegeTabell.app.repository.ShopRepository;
@@ -39,15 +40,18 @@ public class SellerController {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ReservationRepository reservationRepository;
+    private final NotificationRepository notificationRepository;
 
     public SellerController(ShopRepository shopRepository,
                              ProductRepository productRepository,
                              CategoryRepository categoryRepository,
-                             ReservationRepository reservationRepository) {
+                             ReservationRepository reservationRepository,
+                             NotificationRepository notificationRepository) {
         this.shopRepository = shopRepository;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.reservationRepository = reservationRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @GetMapping("/dashboard")
@@ -66,6 +70,8 @@ public class SellerController {
                 .stream()
                 .map(SellerReservationView::from)
                 .toList());
+        model.addAttribute("unreadNotificationCount",
+                notificationRepository.countByUserIdAndReadFalse(principal.getUser().getId()));
         return "seller/dashboard";
     }
 
