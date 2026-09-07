@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.name} + ' | VegeTabell'">商品詳細 | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="buyer-page">
+    <div class="page-header">
+        <a th:href="@{/products}" class="back-link">←</a>
+        <h1 class="page-title">商品詳細</h1>
+    </div>
+
+    <div class="detail-photo"
+         th:style="${product.imageUrl != null and not #strings.isEmpty(product.imageUrl)} ? 'background-image:url(' + ${product.imageUrl} + ');' : ''">
+        <span th:if="${product.imageUrl == null or #strings.isEmpty(product.imageUrl)}">🥬</span>
+    </div>
+
+    <p class="detail-urgent-banner" th:if="${product.urgent and product.reservable}">
+        ⏰ 【お早めに！】賞味期限が<span th:text="${product.remainingLabel}">あと3時間</span>に迫っています
+    </p>
+
+    <h2 class="detail-name" th:text="${product.name}">商品名</h2>
+    <p class="detail-shop">
+        <span th:text="${product.shopName}">店舗名</span>
+        <span class="detail-shop-address" th:text="${product.shopAddress}">住所</span>
+    </p>
+
+    <div class="detail-price-box">
+        <p class="detail-price-label">レスキュー特別価格</p>
+        <p class="detail-price-row">
+            <span class="detail-price-rescue" th:text="'¥' + ${product.rescuePrice}">¥0</span>
+            <span class="detail-price-tax">（税込）</span>
+        </p>
+        <p class="detail-price-sub">
+            <span class="price-normal" th:text="'通常価格：¥' + ${product.normalPrice}">通常価格：¥0</span>
+            <span class="savings-badge" th:text="'¥' + ${product.savingsAmount} + 'もおトク！'">¥0もおトク！</span>
+        </p>
+    </div>
+
+    <div class="detail-section" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
+        <h3>商品情報</h3>
+        <p th:text="${product.description}">商品説明</p>
+    </div>
+
+    <div class="detail-section">
+        <p class="detail-stock">
+            <span>残り在庫数量</span>
+            <span class="detail-stock-value" th:text="${product.remainingQuantity} + '点'">0点</span>
+        </p>
+    </div>
+
+    <!-- Step7で予約フォーム（数量選択含む）をここに実装。POST /products/{id}/reservations は未実装 -->
+    <form th:if="${product.reservable}" th:action="@{/products/{id}/reservations(id=${product.id})}" method="post">
+        <button type="submit" class="btn-fab">受け取りを予約する</button>
+    </form>
+    <button type="button" class="btn-fab btn-fab-disabled" th:unless="${product.reservable}" disabled
+            th:text="${product.statusLabel}">完売しました</button>
+</div>
+</body>
+</html>
