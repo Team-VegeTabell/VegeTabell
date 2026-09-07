@@ -1,0 +1,8 @@
+# このファイルを application-local.properties としてコピーし、各自のSupabase接続情報を記入する
+# application-local.properties は .gitignore で除外済み（コミットしないこと）
+
+spring.datasource.password=<自分のSupabaseパスワード>
+
+# ホスト・ユーザー名が個人ごとに異なる場合はここで上書きする
+# spring.datasource.url=jdbc:postgresql://<supabaseホスト>:5432/postgres
+# spring.datasource.username=<ユーザー名>
