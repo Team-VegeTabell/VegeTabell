@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--/* 出品状況の1商品分のカード。dashboard.html / products.html から共有 */-->
+<div class="product-card" th:fragment="productCard(product)">
+    <div class="product-card-image"
+         th:style="${product.imageUrl != null and not #strings.isEmpty(product.imageUrl)} ? 'background-image:url(' + ${product.imageUrl} + ');' : ''">
+        <span th:if="${product.imageUrl == null or #strings.isEmpty(product.imageUrl)}">🥬</span>
+    </div>
+    <div class="product-card-body">
+        <p class="product-card-name" th:text="${product.name}">商品名</p>
+        <p class="product-card-price">
+            <span class="price-rescue" th:text="'¥' + ${product.rescuePrice}">¥0</span>
+            <span class="price-normal" th:text="'通常¥' + ${product.normalPrice}">通常¥0</span>
+        </p>
+        <p class="product-card-quantity"
+           th:text="${product.status.name() == 'SOLD_OUT'} ? '完売しました' : ('残り' + ${product.remainingQuantity} + '点')">
+            残り0点
+        </p>
+    </div>
+    <div class="product-card-actions">
+        <span class="status-badge" th:classappend="'status-' + ${#strings.toLowerCase(product.status.name())}"
+              th:text="${product.status.name() == 'ON_SALE'} ? '出品中' : (${product.status.name() == 'SOLD_OUT'} ? '完売' : '期限切れ')">出品中</span>
+        <form th:if="${product.status.name() == 'ON_SALE'}"
+              th:action="@{/seller/products/{id}/sold-out(id=${product.id})}" method="post">
+            <button type="submit" class="btn-link">完売にする</button>
+        </form>
+        <form th:action="@{/seller/products/{id}/delete(id=${product.id})}" method="post"
+              onsubmit="return confirm('この商品を削除しますか？');">
+            <button type="submit" class="btn-link btn-link-danger">削除する</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

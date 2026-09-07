@@ -30,7 +30,7 @@
 - [x] Step2: Entity・Repository実装（6 Entity + 6 Repository + enum/Converter、`ddl-auto=validate`通過、`CategoryRepositoryTest`で実DBからのデータ取得を確認） (完了: 2026-09-07)
 - [x] Step3: Spring Security設定（`SecurityConfig`/`CustomUserDetailsService`/ログイン時ロール一致チェック、auth-design.md §2の認可マトリクス実装、テスト6クラス16件で検証） (完了: 2026-09-07)
 - [x] Step4: 会員登録・ログイン画面（`AuthController`/`SignupForm`/`SignupService`、`/login`・`/signup`テンプレート、テスト8クラス28件で検証。実DB(Supabase)への登録・ログイン・ロール不一致・ログアウトも手動確認済み） (完了: 2026-09-07)
-- [ ] Step5: 売り手：商品出品機能
+- [x] Step5: 売り手：商品出品機能（`SellerController`/`ProductForm`、`/seller/dashboard`・`/seller/products`・`/seller/products/new`とsold-out/delete操作を実装、テスト1クラス10件で検証。実DBでの手動確認は未実施） (完了: 2026-09-07)
 - [ ] Step6: 買い手：商品一覧・詳細
 - [ ] Step7: 予約機能・キャンセル
 - [ ] Step8: 通知機能
@@ -119,6 +119,14 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - `auth-design.md`の認可表は`/`を`ROLE_BUYER`限定としているが、`api-design.md`は「`/`はログイン後roleに応じて`/products`または`/seller/dashboard`へリダイレクト」としており、売り手が直接ログインすると（保存済みリクエストが無い場合のデフォルト遷移先が`/`のため）即403になってしまう矛盾があった。`SecurityConfig`の認可設定（`/`はBUYER限定のまま）には手を入れず、`RoleMatchAuthenticationSuccessHandler`のログイン成功後デフォルト遷移先をロールに応じて`/`（買い手）／`/seller/dashboard`（売り手）に振り分けるよう修正して解決した（売り手を`/`に送らないようにすることで両ドキュメントを両立）
 - 上記修正にあたり、`RoleMatchAuthenticationSuccessHandler`（シングルトンBean）が`SavedRequestAwareAuthenticationSuccessHandler`をインスタンスフィールドとして使い回していたため、同時ログイン時にリダイレクト先設定が競合するおそれがあった。リクエストごとにローカルインスタンスを生成する形に修正済み
 - `/`・`/products`・`/seller/dashboard`はまだControllerが無いため、ログイン直後のリダイレクトは404になる（Step5/6でController実装まで想定通り）
+
+### Step5実装時の判断・申し送り事項
+
+- **商品写真**：overview.mdで「アップロード方式は未確定」と申し送りされていた項目。Step5ではファイルアップロードは実装せず、`image_url`にURLを直接入力する簡易フォームとした。未入力時はCSSで🥬プレースホルダーを表示。実ファイルアップロード（ローカル保存 or Supabase Storage）は引き続き未確定のため、対応する場合は別Stepで検討すること
+- **商品説明（description）欄**：`functional-requirements.md §2`の入力項目一覧・ワイヤーフレーム（seller-listing.png）のどちらにも記載が無いため、出品フォームには含めていない（DBカラムはNULLのまま）。商品詳細画面（Step6）で説明文が必要になった場合は、出品フォームへの項目追加を検討
+- **ダッシュボードの売上集計**：ワイヤーフレーム（seller-dashboard.png）には「レスキュー完了（売上）」カードがあるが、予約機能（Step7）が未実装のため常に0円表示になり実態と合わない。Step5では「本日出品アイテム」件数と出品状況一覧のみを表示し、売上カードはStep7実装後に追加する
+- **削除時の予約チェック**：`ReservationRepository.existsByProductId`で予約有無を確認し、予約が1件でもあれば削除せず`/seller/products`にリダイレクトしてエラーメッセージ（flash attribute）を表示する方式にした
+- **実DBでの動作確認未実施**：本セッションの開発環境にSupabaseの接続パスワードが無く、`VegeTabellAppApplicationTests#contextLoads`は元々（main上でも）失敗する状態。`SellerControllerTest`はRepositoryをモックしたMockMvcテストのみで検証済み。実機（Eclipse＋Supabase接続）での出品→一覧反映→完売/削除操作の手動確認をチームの誰かに依頼すること
 
 ---
 
