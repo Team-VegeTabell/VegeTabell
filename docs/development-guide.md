@@ -27,7 +27,7 @@
 
 ### 実装（機能単位・[§5の推奨順序](#5-実装の推奨順序)に対応）
 - [x] Step1: Supabase上に`db-design.md`通りのテーブルをSQLで作成（Supabase MCPの`apply_migration`で適用済み） (完了: 2026-09-07)
-- [ ] Step2: Entity・Repository実装（DB接続自体は確認済み。Entity/Repositoryクラスの実装が未着手）
+- [x] Step2: Entity・Repository実装（6 Entity + 6 Repository + enum/Converter、`ddl-auto=validate`通過、`CategoryRepositoryTest`で実DBからのデータ取得を確認） (完了: 2026-09-07)
 - [ ] Step3: Spring Security設定（認証・認可・ロール一致チェック）
 - [ ] Step4: 会員登録・ログイン画面
 - [ ] Step5: 売り手：商品出品機能
