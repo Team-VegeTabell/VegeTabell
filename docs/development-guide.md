@@ -28,7 +28,7 @@
 ### 実装（機能単位・[§5の推奨順序](#5-実装の推奨順序)に対応）
 - [x] Step1: Supabase上に`db-design.md`通りのテーブルをSQLで作成（Supabase MCPの`apply_migration`で適用済み） (完了: 2026-09-07)
 - [x] Step2: Entity・Repository実装（6 Entity + 6 Repository + enum/Converter、`ddl-auto=validate`通過、`CategoryRepositoryTest`で実DBからのデータ取得を確認） (完了: 2026-09-07)
-- [ ] Step3: Spring Security設定（認証・認可・ロール一致チェック）
+- [x] Step3: Spring Security設定（`SecurityConfig`/`CustomUserDetailsService`/ログイン時ロール一致チェック、auth-design.md §2の認可マトリクス実装、テスト6クラス16件で検証） (完了: 2026-09-07)
 - [ ] Step4: 会員登録・ログイン画面
 - [ ] Step5: 売り手：商品出品機能
 - [ ] Step6: 買い手：商品一覧・詳細
@@ -107,6 +107,12 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 `db-design.md`通りのテーブル（users/shops/categories/products/reservations/notifications）はSupabase MCPの`apply_migration`で作成済み（Step1完了）。`ddl-auto`は`validate`（JPAのEntity定義とDBスキーマの不一致を検知するのみ）にしてあるため、Entity実装時にスキーマとズレがあればここでエラーになる。`update`にすると意図しないスキーマ変更が起きうるため非推奨。
 
 なお、このアプリはSupabase Auth/PostgRESTを使わずSpring Boot側で直接JDBC接続・独自認証を行う構成のため、全テーブルでRLS（Row Level Security）を有効化（ポリシーは追加せずデフォルト拒否）し、anon/publishableキー経由でのPostgREST公開を塞いである。バックエンドの直接接続（`postgres`ユーザー）はRLSの影響を受けずアクセス可能。
+
+### Step3（Spring Security）からStep4（会員登録・ログイン画面）への申し送り
+
+- ログインフォームは`username`（＝email）・`password`に加えて、買い手/売り手トグル用に**`role`という名前**のフィールドを送信すること（`buyer`または`seller`の小文字。`RoleMatchAuthenticationSuccessHandler`が参照する）
+- 通常のメール/パスワード間違い（`/login?error`）と、ロール不一致（`/login?error=role`）は**パラメータ値に関わらず表示文言を完全に同じ**にすること（「メールアドレス、パスワード、またはアカウント種別が正しくありません」）。どちらが誤りかをUI側で分岐して教えない
+- `SecurityConfig`は`.loginPage("/login")`を明示指定しているため、Spring Securityの自動生成ログインページは使われない。Step4で`/login`にGETで表示用のController/テンプレートを実装するまでは`/login`は404になる（意図した状態）
 
 ---
 
