@@ -1,1 +1,6 @@
 .DS_Store
+
+# Claude Code（個人ローカル設定・インストール済みスキルの中身。skills-lock.jsonから再生成可能）
+.claude/settings.local.json
+.claude/skills/
+.agents/

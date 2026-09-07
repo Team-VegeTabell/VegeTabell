@@ -1,7 +1,7 @@
 # アプリ企画概要
 
 授業課題として作成する、フードロス削減マッチングアプリの企画まとめ。
-詳細な機能要件は [functional-requirements.md](./functional-requirements.md)、DB設計は [db-design.md](./db-design.md)、API設計は [api-design.md](./api-design.md)、認証設計は [auth-design.md](./auth-design.md) を参照。
+詳細な機能要件は [functional-requirements.md](./functional-requirements.md)、DB設計は [db-design.md](./db-design.md)、API設計は [api-design.md](./api-design.md)、認証設計は [auth-design.md](./auth-design.md)、Eclipseでの実装手順は [development-guide.md](./development-guide.md) を参照。
 
 ---
 
