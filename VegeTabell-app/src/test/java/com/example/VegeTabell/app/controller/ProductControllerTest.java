@@ -7,6 +7,7 @@ import com.example.VegeTabell.app.entity.User;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.entity.type.UserRole;
 import com.example.VegeTabell.app.repository.CategoryRepository;
+import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
 import com.example.VegeTabell.app.security.CustomUserDetails;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,9 @@ class ProductControllerTest {
 
     @MockitoBean
     private CategoryRepository categoryRepository;
+
+    @MockitoBean
+    private NotificationRepository notificationRepository;
 
     private UserDetails buyerPrincipal() {
         User user = new User();

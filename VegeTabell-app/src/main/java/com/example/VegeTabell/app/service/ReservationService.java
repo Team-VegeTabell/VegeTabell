@@ -1,11 +1,14 @@
 package com.example.VegeTabell.app.service;
 
+import com.example.VegeTabell.app.entity.Notification;
 import com.example.VegeTabell.app.entity.Product;
 import com.example.VegeTabell.app.entity.Reservation;
 import com.example.VegeTabell.app.entity.User;
 import com.example.VegeTabell.app.entity.type.CanceledBy;
+import com.example.VegeTabell.app.entity.type.NotificationType;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.entity.type.ReservationStatus;
+import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
 import com.example.VegeTabell.app.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
@@ -18,10 +21,14 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
+    private final NotificationRepository notificationRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, ProductRepository productRepository) {
+    public ReservationService(ReservationRepository reservationRepository,
+                               ProductRepository productRepository,
+                               NotificationRepository notificationRepository) {
         this.reservationRepository = reservationRepository;
         this.productRepository = productRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     // 呼び出し元（ReservationController）が在庫・ステータスの妥当性チェック済みであることを前提とする。
@@ -44,7 +51,14 @@ public class ReservationService {
         reservation.setPickupStartAt(now);
         reservation.setPickupEndAt(product.getExpiryAt());
         reservation.setStatus(ReservationStatus.RESERVED);
-        return reservationRepository.save(reservation);
+        Reservation saved = reservationRepository.save(reservation);
+
+        notify(buyer, NotificationType.RESERVATION_CONFIRMED, "予約が確定しました",
+                product.getName() + "を予約しました", product, saved);
+        notify(product.getShop().getUser(), NotificationType.NEW_RESERVATION, "新しい予約が入りました",
+                buyer.getDisplayName() + "さんが" + product.getName() + "を予約しました", product, saved);
+
+        return saved;
     }
 
     @Transactional
@@ -60,5 +74,24 @@ public class ReservationService {
             product.setStatus(ProductStatus.ON_SALE);
         }
         productRepository.save(product);
+
+        // キャンセルした側は自分の操作を把握済みのため、相手側にのみ通知する。
+        User recipient = canceledBy == CanceledBy.BUYER
+                ? product.getShop().getUser()
+                : reservation.getBuyer();
+        notify(recipient, NotificationType.RESERVATION_CANCELED, "予約がキャンセルされました",
+                product.getName() + "の予約がキャンセルされました", product, reservation);
+    }
+
+    private void notify(User recipient, NotificationType type, String title, String body,
+                         Product product, Reservation reservation) {
+        Notification notification = new Notification();
+        notification.setUser(recipient);
+        notification.setType(type);
+        notification.setTitle(title);
+        notification.setBody(body);
+        notification.setProduct(product);
+        notification.setReservation(reservation);
+        notificationRepository.save(notification);
     }
 }

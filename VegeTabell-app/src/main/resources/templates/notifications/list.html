@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>通知 | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="buyer-page">
+    <div class="page-header">
+        <a th:href="@{${homeUrl}}" class="back-link">←</a>
+        <h1 class="page-title">通知</h1>
+    </div>
+
+    <p class="empty-state" th:if="${#lists.isEmpty(notifications)}">通知はありません</p>
+
+    <div class="notification-list">
+        <form th:each="n : ${notifications}"
+              th:action="@{/notifications/{id}/read(id=${n.id})}" method="post">
+            <button type="submit" class="notification-card" th:classappend="${n.read} ? '' : 'notification-card-unread'">
+                <span class="notification-unread-dot" th:if="${not n.read}"></span>
+                <span class="notification-body-wrap">
+                    <p class="notification-title" th:text="${n.title}">通知タイトル</p>
+                    <p class="notification-message" th:if="${n.body != null and not #strings.isEmpty(n.body)}" th:text="${n.body}">本文</p>
+                    <p class="notification-meta" th:text="${n.createdAtLabel}">9/7 21:00</p>
+                </span>
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -8,6 +8,14 @@
 </head>
 <body>
 <div class="buyer-page">
+    <div class="home-header">
+        <h1 class="home-title">VegeTabell</h1>
+        <a th:href="@{/notifications}" class="bell-button">
+            🔔
+            <span class="bell-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">1</span>
+        </a>
+    </div>
+
     <form th:action="@{/products}" method="get" class="search-form">
         <input type="text" name="area" th:value="${area}" placeholder="エリア（住所）で絞り込み" class="area-input">
         <input type="text" name="keyword" th:value="${keyword}" placeholder="お得なsurplusフードを検索">

@@ -33,7 +33,7 @@
 - [x] Step5: 売り手：商品出品機能（`SellerController`/`ProductForm`、`/seller/dashboard`・`/seller/products`・`/seller/products/new`とsold-out/delete操作を実装、テスト1クラス10件で検証。実DB(Supabase)への出品・完売・削除も手動確認済み） (完了: 2026-09-07)
 - [x] Step6: 買い手：商品一覧・詳細（`ProductController`/`ProductSummary`/`ProductDetail`、`/`・`/products`・`/products/{id}`を実装。カテゴリ・キーワード・エリア（店舗住所）絞り込み、割引率・残り時間・完売時の予約ボタン無効化に対応。テスト1クラス7件＋実DBへの手動確認で検証） (完了: 2026-09-07)
 - [x] Step7: 予約機能・キャンセル（`ReservationController`/`ReservationService`/`ReservationForm`、`/products/{id}/reservations`・`/reservations/{id}`・`/reservations/{id}/cancel`を実装。数量選択UI、在庫減算/復元、sold_out自動化、売り手ダッシュボードへの予約一覧＋キャンセル追加。テスト2クラス17件＋実DBへの手動確認で検証） (完了: 2026-09-07)
-- [ ] Step8: 通知機能
+- [x] Step8: 通知機能（`NotificationController`/`NotificationView`、`/notifications`・`/notifications/{id}/read`を実装。予約作成/キャンセル時に`ReservationService`から通知を生成、買い手ホーム・売り手ダッシュボードに未読バッジ付きベルアイコンを追加。`NotificationControllerTest`6件を新規追加、`ReservationServiceTest`に通知生成の検証3件を追加＋実DBへの手動確認で検証） (完了: 2026-09-08)
 - [ ] Step9: バッチ処理（`@Scheduled`）
 - [ ] Step10: ワイヤーフレーム・画面遷移図との突合せ、レスポンシブ調整
 
@@ -145,6 +145,14 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - **同時予約の整合性**：db-design.mdの未確定事項の通り、Step7では単純な読み取り→更新のトランザクション処理のみとし、悲観ロック等の対策は行っていない
 - **`SecurityConfig`の認可調整**：auth-design.md §2の補足通り、`POST /reservations/{id}/cancel`のみ買い手・売り手どちらもアクセスしうるため、`/reservations/**`のBUYER限定ルールより先に`authenticated()`のみのルールを追加し、所有者チェック（本人の予約 or 自店舗の商品の予約）はコントローラー側で行う方式にした
 - **バグ発見・修正**：実機確認で、受取可能時間帯が日をまたぐ場合に「本日21:37〜00:35まで」のように終了時刻が翌日であることが分からない表示になっていたのを発見。終了時刻の日付が開始日と異なる場合は「翌日」または日付ラベルを付けるよう`PickupWindowPresenter`を修正した
+
+### Step8実装時の判断・申し送り事項
+
+- **生成する通知の範囲**：db-design.mdが定義する6種類の通知のうち、既存イベントに紐づく`reservation_confirmed`／`new_reservation`／`reservation_canceled`の3種類のみをStep8で実装した。残り3種類は生成元イベントが無いため見送り：`pickup_reminder`と`stock_expiring_warning`はStep9のバッチ処理待ち、`new_product_nearby`は買い手の位置情報を保存する仕組みが無い（Step6から続く未対応事項）ため実装できない
+- **キャンセル通知の宛先**：`reservation_canceled`はキャンセルした側ではなく、**相手側にのみ**送るようにした（自分の操作について自分に通知するのは冗長なため）。買い手がキャンセルすれば売り手へ、売り手がキャンセルすれば買い手へ1件ずつ生成する
+- **既読化時の遷移先**：通知をタップすると既読化し、関連予約があれば買い手は`/reservations/{id}`へ、売り手は（個別の予約閲覧画面が無いため）`/seller/dashboard`へ遷移する。関連予約が無い通知は`/notifications`に留まる
+- **未読バッジの表示範囲**：ワイヤーフレームに合わせて買い手ホーム（`/products`）と売り手ダッシュボード（`/seller/dashboard`）のみに表示し、共通ヘッダーが無い他の画面（商品詳細・出品フォーム等）には追加していない。全画面共通のナビ構成はStep10で整理する想定
+- **通知一覧の「戻る」リンク**：`/`は買い手専用（`SecurityConfig`でROLE_BUYER限定）のため、売り手が`/notifications`から戻る際に`/`へのリンクだと403になる。`NotificationController`側でログインユーザーのロールに応じた戻り先（`/products`または`/seller/dashboard`）をModelに渡す方式で解決した
 
 ---
 

@@ -10,10 +10,14 @@
 <div class="seller-page">
     <div class="seller-header">
         <div class="shop-avatar">🏪</div>
-        <div>
+        <div class="seller-header-name">
             <p class="shop-name" th:text="${shop.shopName}">店舗名</p>
             <p class="shop-role-label">出品アカウント</p>
         </div>
+        <a th:href="@{/notifications}" class="bell-button">
+            🔔
+            <span class="bell-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">1</span>
+        </a>
     </div>
 
     <h2 class="section-title">本日の状況</h2>

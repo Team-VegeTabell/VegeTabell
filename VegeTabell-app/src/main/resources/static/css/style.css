@@ -816,3 +816,114 @@ body {
   color: var(--color-muted);
   margin: 0;
 }
+
+/* ホームヘッダーのベルアイコン・未読バッジ */
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.home-title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.seller-header-name {
+  flex: 1;
+}
+
+.bell-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-field-bg);
+  font-size: 18px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.bell-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 通知一覧 */
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.notification-card-unread {
+  background: var(--color-field-bg);
+  border-color: transparent;
+}
+
+.notification-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-error);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.notification-body-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.notification-card:not(.notification-card-unread) .notification-title {
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.notification-message {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin: 0 0 6px;
+}
+
+.notification-meta {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: 0;
+}

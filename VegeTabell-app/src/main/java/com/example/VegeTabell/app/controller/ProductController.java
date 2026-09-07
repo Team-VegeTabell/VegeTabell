@@ -6,8 +6,11 @@ import com.example.VegeTabell.app.entity.Product;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.form.ReservationForm;
 import com.example.VegeTabell.app.repository.CategoryRepository;
+import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
+import com.example.VegeTabell.app.security.CustomUserDetails;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -24,10 +27,14 @@ public class ProductController {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final NotificationRepository notificationRepository;
 
-    public ProductController(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductController(ProductRepository productRepository,
+                              CategoryRepository categoryRepository,
+                              NotificationRepository notificationRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @GetMapping("/")
@@ -39,7 +46,8 @@ public class ProductController {
     public String list(@RequestParam(required = false) Long category,
                         @RequestParam(required = false) String keyword,
                         @RequestParam(required = false) String area,
-                        Model model) {
+                        Model model,
+                        @AuthenticationPrincipal CustomUserDetails principal) {
         Instant now = Instant.now();
         List<ProductSummary> products = productRepository
                 .findAvailableForBuyer(ProductStatus.ON_SALE, category,
@@ -53,6 +61,8 @@ public class ProductController {
         model.addAttribute("selectedCategory", category);
         model.addAttribute("keyword", keyword);
         model.addAttribute("area", area);
+        model.addAttribute("unreadNotificationCount",
+                notificationRepository.countByUserIdAndReadFalse(principal.getUser().getId()));
         return "products/list";
     }
 
