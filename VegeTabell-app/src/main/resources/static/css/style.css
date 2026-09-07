@@ -187,3 +187,246 @@ body {
   background: #fbeceb;
   color: var(--color-error);
 }
+
+/* 売り手向けページ（ダッシュボード・出品リスト・出品フォーム） */
+.seller-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 20px 96px;
+}
+
+.seller-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.shop-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-field-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.shop-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.shop-role-label {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin: 2px 0 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.back-link {
+  font-size: 20px;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.section-link {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.stat-cards {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--color-field-bg);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin: 0 0 6px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.product-card {
+  display: flex;
+  gap: 12px;
+  background: var(--color-field-bg);
+  border-radius: 16px;
+  padding: 12px;
+  align-items: center;
+}
+
+.product-card-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-pill-bg);
+  font-size: 24px;
+}
+
+.product-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-card-name {
+  font-weight: 700;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card-price {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.price-rescue {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.price-normal {
+  color: var(--color-muted);
+  text-decoration: line-through;
+  font-size: 13px;
+}
+
+.product-card-quantity {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.product-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.status-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-pill-selected-bg);
+  white-space: nowrap;
+}
+
+.status-badge.status-sold_out,
+.status-badge.status-expired {
+  color: var(--color-muted);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--color-text);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.btn-link-danger {
+  color: var(--color-error);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-row .field {
+  flex: 1;
+}
+
+.field select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  font-size: 15px;
+}
+
+.btn-fab {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 440px;
+  display: block;
+  text-align: center;
+  padding: 16px;
+  border-radius: 999px;
+  background: var(--color-button-bg);
+  color: var(--color-button-text);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}

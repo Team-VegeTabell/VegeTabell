@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>出品リスト | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="seller-page">
+    <div class="page-header">
+        <a th:href="@{/seller/dashboard}" class="back-link">←</a>
+        <h1 class="page-title">出品リスト</h1>
+    </div>
+
+    <p class="auth-message error" th:if="${deleteError != null}" th:text="${deleteError}"></p>
+
+    <div class="product-list">
+        <p class="empty-state" th:if="${#lists.isEmpty(products)}">まだ出品がありません</p>
+        <div th:each="p : ${products}">
+            <div th:replace="~{seller/fragments :: productCard(${p})}"></div>
+        </div>
+    </div>
+
+    <a th:href="@{/seller/products/new}" class="btn-fab">＋ 商品を登録する</a>
+</div>
+</body>
+</html>

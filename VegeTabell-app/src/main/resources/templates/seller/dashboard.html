@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ダッシュボード | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="seller-page">
+    <div class="seller-header">
+        <div class="shop-avatar">🏪</div>
+        <div>
+            <p class="shop-name" th:text="${shop.shopName}">店舗名</p>
+            <p class="shop-role-label">出品アカウント</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">本日の状況</h2>
+    <div class="stat-cards">
+        <div class="stat-card">
+            <p class="stat-label">本日出品アイテム</p>
+            <p class="stat-value" th:text="${todayListedCount} + ' 点'">0 点</p>
+        </div>
+    </div>
+
+    <div class="section-title-row">
+        <h2 class="section-title">現在の出品状況</h2>
+        <a th:href="@{/seller/products}" class="section-link">すべて見る</a>
+    </div>
+
+    <div class="product-list">
+        <p class="empty-state" th:if="${#lists.isEmpty(products)}">まだ出品がありません</p>
+        <div th:each="p : ${products}">
+            <div th:replace="~{seller/fragments :: productCard(${p})}"></div>
+        </div>
+    </div>
+
+    <a th:href="@{/seller/products/new}" class="btn-fab">＋ 商品を登録する</a>
+</div>
+</body>
+</html>

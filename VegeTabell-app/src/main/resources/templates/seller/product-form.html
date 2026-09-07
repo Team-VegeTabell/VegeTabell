@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新しく出品する | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="seller-page">
+    <div class="page-header">
+        <a th:href="@{/seller/products}" class="back-link">←</a>
+        <h1 class="page-title">新しく出品する</h1>
+    </div>
+
+    <form th:action="@{/seller/products}" th:object="${productForm}" method="post">
+        <div class="field">
+            <label for="imageUrl">商品の写真URL（任意）</label>
+            <input type="text" id="imageUrl" th:field="*{imageUrl}" placeholder="https://...">
+            <p class="field-error" th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}"></p>
+        </div>
+
+        <div class="field">
+            <label for="name">商品名</label>
+            <input type="text" id="name" th:field="*{name}">
+            <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+        </div>
+
+        <div class="field">
+            <label for="categoryId">カテゴリー</label>
+            <select id="categoryId" th:field="*{categoryId}">
+                <option value="">選択してください</option>
+                <option th:each="category : ${categories}"
+                        th:value="${category.id}"
+                        th:text="${category.icon} + ' ' + ${category.name}">野菜</option>
+            </select>
+            <p class="field-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></p>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label for="normalPrice">通常価格（円）</label>
+                <input type="number" min="0" id="normalPrice" th:field="*{normalPrice}">
+                <p class="field-error" th:if="${#fields.hasErrors('normalPrice')}" th:errors="*{normalPrice}"></p>
+            </div>
+            <div class="field">
+                <label for="rescuePrice">レスキュー価格（円）</label>
+                <input type="number" min="0" id="rescuePrice" th:field="*{rescuePrice}">
+                <p class="field-error" th:if="${#fields.hasErrors('rescuePrice')}" th:errors="*{rescuePrice}"></p>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="expiryAt">引取期限・消費期限</label>
+            <input type="datetime-local" id="expiryAt" th:field="*{expiryAt}">
+            <p class="field-error" th:if="${#fields.hasErrors('expiryAt')}" th:errors="*{expiryAt}"></p>
+        </div>
+
+        <div class="field">
+            <label for="totalQuantity">出品個数</label>
+            <input type="number" min="1" id="totalQuantity" th:field="*{totalQuantity}">
+            <p class="field-error" th:if="${#fields.hasErrors('totalQuantity')}" th:errors="*{totalQuantity}"></p>
+        </div>
+
+        <button type="submit" class="btn-primary">出品する</button>
+    </form>
+</div>
+</body>
+</html>
