@@ -32,8 +32,7 @@
 - [x] Step4: 会員登録・ログイン画面（`AuthController`/`SignupForm`/`SignupService`、`/login`・`/signup`テンプレート、テスト8クラス28件で検証。実DB(Supabase)への登録・ログイン・ロール不一致・ログアウトも手動確認済み） (完了: 2026-09-07)
 - [x] Step5: 売り手：商品出品機能（`SellerController`/`ProductForm`、`/seller/dashboard`・`/seller/products`・`/seller/products/new`とsold-out/delete操作を実装、テスト1クラス10件で検証。実DB(Supabase)への出品・完売・削除も手動確認済み） (完了: 2026-09-07)
 - [x] Step6: 買い手：商品一覧・詳細（`ProductController`/`ProductSummary`/`ProductDetail`、`/`・`/products`・`/products/{id}`を実装。カテゴリ・キーワード・エリア（店舗住所）絞り込み、割引率・残り時間・完売時の予約ボタン無効化に対応。テスト1クラス7件＋実DBへの手動確認で検証） (完了: 2026-09-07)
-- [ ] Step7: 予約機能・キャンセル
-- [ ] Step7: 予約機能・キャンセル
+- [x] Step7: 予約機能・キャンセル（`ReservationController`/`ReservationService`/`ReservationForm`、`/products/{id}/reservations`・`/reservations/{id}`・`/reservations/{id}/cancel`を実装。数量選択UI、在庫減算/復元、sold_out自動化、売り手ダッシュボードへの予約一覧＋キャンセル追加。テスト2クラス17件＋実DBへの手動確認で検証） (完了: 2026-09-07)
 - [ ] Step8: 通知機能
 - [ ] Step9: バッチ処理（`@Scheduled`）
 - [ ] Step10: ワイヤーフレーム・画面遷移図との突合せ、レスポンシブ調整
@@ -136,6 +135,16 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - **一覧・詳細のsold_out商品の扱い**：一覧（`/products`）は`status=on_sale AND remaining_quantity>0`のみ表示。詳細（`/products/{id}`）はステータスを問わず表示し、`on_sale`以外は予約ボタンを無効化して「完売しました」等のラベルを表示する方式にした（`functional-requirements.md §4`の「在庫切れ表示」要件に対応）
 - **期限が迫っている警告バナーのしきい値**：「残り6時間未満」をMVP暫定値として採用（要件・ワイヤーフレームに具体的な時間指定が無いため）。運用してみて長さが合わなければ調整すること
 - **バグ発見・修正**：キーワード/エリアが未入力（null）の場合、JPQLの`LOWER(CONCAT('%', :keyword, '%'))`をPostgreSQLが型推論できず`function lower(bytea) does not exist`で500エラーになる不具合を実機確認中に発見。`CONCAT`をJPQLから外し、Java側で`"%" + value.toLowerCase() + "%"`のLIKEパターン文字列を組み立ててから渡す方式に修正して解消した
+- **ドキュメント不具合の修正**：Step6のコミットで進捗チェックリストの「Step7」行が誤って2行重複していたため、本Step7の作業と合わせて修正した
+
+### Step7実装時の判断・申し送り事項
+
+- **受取可能時間帯（pickup_start_at/pickup_end_at）**：db-design.md/functional-requirements.mdに決定ルールが無いため、`pickup_start_at=予約時刻`・`pickup_end_at=商品のexpiry_at`と定義した（「引取期限」をそのまま受取終了時刻として扱うMVP暫定ルール）。この定義だと予約時刻が深夜近くの場合は受取時間帯が日をまたぐため、表示文言では終了時刻側に「翌日」ラベルを付けて明確化している（`PickupWindowPresenter`）
+- **売り手の予約一覧**：api-design.mdには売り手向けの予約一覧GETエンドポイントが定義されておらず、ワイヤーフレームにも対応画面が無かった（売り手がキャンセルするには予約IDを知る手段が必要なため、実装上のギャップだった）。`/seller/dashboard`に「予約一覧」セクションを追加する形で解消した（チームに確認済み）
+- **通知（reservation_confirmed等）の生成**：db-design.mdでは予約作成・キャンセル時に通知を生成する設計だが、通知機能自体はStep8のため、Step7では通知レコードの作成は行っていない（Step8でまとめて実装する）
+- **同時予約の整合性**：db-design.mdの未確定事項の通り、Step7では単純な読み取り→更新のトランザクション処理のみとし、悲観ロック等の対策は行っていない
+- **`SecurityConfig`の認可調整**：auth-design.md §2の補足通り、`POST /reservations/{id}/cancel`のみ買い手・売り手どちらもアクセスしうるため、`/reservations/**`のBUYER限定ルールより先に`authenticated()`のみのルールを追加し、所有者チェック（本人の予約 or 自店舗の商品の予約）はコントローラー側で行う方式にした
+- **バグ発見・修正**：実機確認で、受取可能時間帯が日をまたぐ場合に「本日21:37〜00:35まで」のように終了時刻が翌日であることが分からない表示になっていたのを発見。終了時刻の日付が開始日と異なる場合は「翌日」または日付ラベルを付けるよう`PickupWindowPresenter`を修正した
 
 ---
 

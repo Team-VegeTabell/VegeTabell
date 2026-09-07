@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>予約内容の確認 | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="buyer-page">
+    <div class="page-header">
+        <a th:href="@{/products}" class="back-link">←</a>
+        <h1 class="page-title">予約内容の確認</h1>
+    </div>
+
+    <p class="auth-message error" th:if="${cancelError != null}" th:text="${cancelError}"></p>
+
+    <p class="confirm-status-banner" th:unless="${reservation.cancelable}" th:text="${reservation.statusLabel}">
+        キャンセル済み
+    </p>
+
+    <div class="confirm-card">
+        <h3 class="confirm-card-title">予約商品</h3>
+        <div class="confirm-product">
+            <div class="confirm-product-image"
+                 th:style="${reservation.productImageUrl != null and not #strings.isEmpty(reservation.productImageUrl)} ? 'background-image:url(' + ${reservation.productImageUrl} + ');' : ''">
+                <span th:if="${reservation.productImageUrl == null or #strings.isEmpty(reservation.productImageUrl)}">🥬</span>
+            </div>
+            <div>
+                <p class="confirm-product-name" th:text="${reservation.productName}">商品名</p>
+                <p class="confirm-product-shop" th:text="${reservation.shopName}">店舗名</p>
+            </div>
+        </div>
+        <div class="confirm-row">
+            <span>数量</span>
+            <span th:text="${reservation.quantity} + '点'">1点</span>
+        </div>
+        <div class="confirm-row confirm-total">
+            <span>お支払い合計（店頭支払い）</span>
+            <span th:text="'¥' + ${reservation.totalPrice}">¥0</span>
+        </div>
+    </div>
+
+    <div class="confirm-card">
+        <h3 class="confirm-card-title">お受け取り情報</h3>
+        <p class="confirm-pickup-label">🕐 受取可能時間</p>
+        <p class="confirm-pickup-time" th:text="${reservation.pickupWindowLabel}">本日16:00〜19:00まで</p>
+
+        <p class="confirm-pickup-label">📍 受取店舗・場所</p>
+        <p class="confirm-pickup-address" th:text="${reservation.shopAddress}">住所</p>
+        <p class="confirm-pickup-note" th:if="${reservation.pickupNote != null and not #strings.isEmpty(reservation.pickupNote)}"
+           th:text="${reservation.pickupNote}">目印</p>
+    </div>
+
+    <p class="confirm-warning" th:if="${reservation.cancelable}">
+        ⚠ 店頭で商品を受け取る際に、アプリの予約画面を提示して現金または指定の電子決済でお支払いください。
+    </p>
+
+    <form th:if="${reservation.cancelable}" th:action="@{/reservations/{id}/cancel(id=${reservation.id})}" method="post"
+          onsubmit="return confirm('この予約をキャンセルしますか？');">
+        <button type="submit" class="btn-link btn-link-danger confirm-cancel-button">予約をキャンセルする</button>
+    </form>
+</div>
+</body>
+</html>

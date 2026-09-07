@@ -4,6 +4,7 @@ import com.example.VegeTabell.app.dto.ProductDetail;
 import com.example.VegeTabell.app.dto.ProductSummary;
 import com.example.VegeTabell.app.entity.Product;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
+import com.example.VegeTabell.app.form.ReservationForm;
 import com.example.VegeTabell.app.repository.CategoryRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,7 @@ public class ProductController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         model.addAttribute("product", ProductDetail.from(product, Instant.now()));
+        model.addAttribute("reservationForm", new ReservationForm());
         return "products/detail";
     }
 
