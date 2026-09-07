@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>商品一覧 | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="buyer-page">
+    <form th:action="@{/products}" method="get" class="search-form">
+        <input type="text" name="area" th:value="${area}" placeholder="エリア（住所）で絞り込み" class="area-input">
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="お得なsurplusフードを検索">
+        <input type="hidden" name="category" th:if="${selectedCategory != null}" th:value="${selectedCategory}">
+        <button type="submit" class="btn-primary search-submit">検索する</button>
+    </form>
+
+    <div class="category-pills">
+        <a th:href="@{/products(keyword=${keyword},area=${area})}"
+           class="category-pill" th:classappend="${selectedCategory == null} ? 'category-pill-selected' : ''">すべて</a>
+        <a th:each="c : ${categories}"
+           th:href="@{/products(category=${c.id},keyword=${keyword},area=${area})}"
+           class="category-pill"
+           th:classappend="${selectedCategory != null and selectedCategory == c.id} ? 'category-pill-selected' : ''"
+           th:text="${c.icon} + ' ' + ${c.name}">野菜</a>
+    </div>
+
+    <p class="empty-state" th:if="${#lists.isEmpty(products)}">条件に合う商品が見つかりませんでした</p>
+
+    <div class="buyer-product-list">
+        <a class="buyer-product-card" th:each="p : ${products}" th:href="@{/products/{id}(id=${p.id})}">
+            <div class="buyer-product-image"
+                 th:style="${p.imageUrl != null and not #strings.isEmpty(p.imageUrl)} ? 'background-image:url(' + ${p.imageUrl} + ');' : ''">
+                <span th:if="${p.imageUrl == null or #strings.isEmpty(p.imageUrl)}" th:text="${p.categoryIcon}">🥦</span>
+            </div>
+            <div class="buyer-product-body">
+                <p class="buyer-product-meta">
+                    <span th:text="${p.shopName}">店舗名</span>
+                    <span class="expiry-badge" th:text="${p.remainingLabel}">あと3時間</span>
+                </p>
+                <p class="buyer-product-name" th:text="${p.name}">商品名</p>
+                <p class="buyer-product-price">
+                    <span class="price-rescue" th:text="'¥' + ${p.rescuePrice}">¥0</span>
+                    <span class="price-normal" th:text="'¥' + ${p.normalPrice}">¥0</span>
+                    <span class="discount-badge" th:text="${p.discountPercent} + '%OFF'">0%OFF</span>
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

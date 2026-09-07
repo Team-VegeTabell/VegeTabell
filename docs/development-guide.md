@@ -30,8 +30,9 @@
 - [x] Step2: Entity・Repository実装（6 Entity + 6 Repository + enum/Converter、`ddl-auto=validate`通過、`CategoryRepositoryTest`で実DBからのデータ取得を確認） (完了: 2026-09-07)
 - [x] Step3: Spring Security設定（`SecurityConfig`/`CustomUserDetailsService`/ログイン時ロール一致チェック、auth-design.md §2の認可マトリクス実装、テスト6クラス16件で検証） (完了: 2026-09-07)
 - [x] Step4: 会員登録・ログイン画面（`AuthController`/`SignupForm`/`SignupService`、`/login`・`/signup`テンプレート、テスト8クラス28件で検証。実DB(Supabase)への登録・ログイン・ロール不一致・ログアウトも手動確認済み） (完了: 2026-09-07)
-- [x] Step5: 売り手：商品出品機能（`SellerController`/`ProductForm`、`/seller/dashboard`・`/seller/products`・`/seller/products/new`とsold-out/delete操作を実装、テスト1クラス10件で検証。実DBでの手動確認は未実施） (完了: 2026-09-07)
-- [ ] Step6: 買い手：商品一覧・詳細
+- [x] Step5: 売り手：商品出品機能（`SellerController`/`ProductForm`、`/seller/dashboard`・`/seller/products`・`/seller/products/new`とsold-out/delete操作を実装、テスト1クラス10件で検証。実DB(Supabase)への出品・完売・削除も手動確認済み） (完了: 2026-09-07)
+- [x] Step6: 買い手：商品一覧・詳細（`ProductController`/`ProductSummary`/`ProductDetail`、`/`・`/products`・`/products/{id}`を実装。カテゴリ・キーワード・エリア（店舗住所）絞り込み、割引率・残り時間・完売時の予約ボタン無効化に対応。テスト1クラス7件＋実DBへの手動確認で検証） (完了: 2026-09-07)
+- [ ] Step7: 予約機能・キャンセル
 - [ ] Step7: 予約機能・キャンセル
 - [ ] Step8: 通知機能
 - [ ] Step9: バッチ処理（`@Scheduled`）
@@ -126,7 +127,15 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - **商品説明（description）欄**：`functional-requirements.md §2`の入力項目一覧・ワイヤーフレーム（seller-listing.png）のどちらにも記載が無いため、出品フォームには含めていない（DBカラムはNULLのまま）。商品詳細画面（Step6）で説明文が必要になった場合は、出品フォームへの項目追加を検討
 - **ダッシュボードの売上集計**：ワイヤーフレーム（seller-dashboard.png）には「レスキュー完了（売上）」カードがあるが、予約機能（Step7）が未実装のため常に0円表示になり実態と合わない。Step5では「本日出品アイテム」件数と出品状況一覧のみを表示し、売上カードはStep7実装後に追加する
 - **削除時の予約チェック**：`ReservationRepository.existsByProductId`で予約有無を確認し、予約が1件でもあれば削除せず`/seller/products`にリダイレクトしてエラーメッセージ（flash attribute）を表示する方式にした
-- **実DBでの動作確認未実施**：本セッションの開発環境にSupabaseの接続パスワードが無く、`VegeTabellAppApplicationTests#contextLoads`は元々（main上でも）失敗する状態。`SellerControllerTest`はRepositoryをモックしたMockMvcテストのみで検証済み。実機（Eclipse＋Supabase接続）での出品→一覧反映→完売/削除操作の手動確認をチームの誰かに依頼すること
+- **実DBでの動作確認**：マージ後に`--spring.profiles.active=local`でローカル起動し、実際のSupabaseに対して出品→一覧反映→完売/削除操作をブラウザで手動確認済み（確認後にテストデータは削除済み）。なお`VegeTabellAppApplicationTests#contextLoads`はこのセッションでは元々（main上でも）失敗する状態だったが、これはローカルのパスワード未設定が原因で、Step5の変更とは無関係
+
+### Step6実装時の判断・申し送り事項
+
+- **エリア・距離表示**：`db-design.md`の未確定事項（距離表示：リアルタイム計算か簡易固定値か）およびチーム確認の結果、Step6では店舗住所（`shops.address`）への部分一致テキスト検索のみを実装し、ワイヤーフレーム（buyer-home.png/product-detail.png）にある距離「○m」表示・現在地取得（Geolocation）は見送った。買い手の位置情報を保存する仕組み自体も現状無い。実装する場合は別途チームで方針を決めること
+- **予約ボタン**：商品詳細画面に「受け取りを予約する」ボタン（`POST /products/{id}/reservations`宛）は表示するが、Step7で未実装のため押すと404になる（Step4→5と同様の前方参照）。数量選択UIも予約フォームの一部としてStep7で実装予定のため、Step6では「残り在庫数量」の表示のみ
+- **一覧・詳細のsold_out商品の扱い**：一覧（`/products`）は`status=on_sale AND remaining_quantity>0`のみ表示。詳細（`/products/{id}`）はステータスを問わず表示し、`on_sale`以外は予約ボタンを無効化して「完売しました」等のラベルを表示する方式にした（`functional-requirements.md §4`の「在庫切れ表示」要件に対応）
+- **期限が迫っている警告バナーのしきい値**：「残り6時間未満」をMVP暫定値として採用（要件・ワイヤーフレームに具体的な時間指定が無いため）。運用してみて長さが合わなければ調整すること
+- **バグ発見・修正**：キーワード/エリアが未入力（null）の場合、JPQLの`LOWER(CONCAT('%', :keyword, '%'))`をPostgreSQLが型推論できず`function lower(bytea) does not exist`で500エラーになる不具合を実機確認中に発見。`CONCAT`をJPQLから外し、Java側で`"%" + value.toLowerCase() + "%"`のLIKEパターン文字列を組み立ててから渡す方式に修正して解消した
 
 ---
 
