@@ -18,9 +18,10 @@ public class RoleMatchAuthenticationSuccessHandler implements AuthenticationSucc
     // ログインフォームの買い手/売り手トグルのフィールド名。Step4はこの名前で送信すること。
     private static final String ROLE_PARAM = "role";
     private static final String ROLE_MISMATCH_REDIRECT = "/login?error=role";
+    private static final String BUYER_DEFAULT_TARGET = "/";
+    private static final String SELLER_DEFAULT_TARGET = "/seller/dashboard";
 
     private final LoginRoleMatcher loginRoleMatcher;
-    private final AuthenticationSuccessHandler delegate = new SavedRequestAwareAuthenticationSuccessHandler();
 
     public RoleMatchAuthenticationSuccessHandler(LoginRoleMatcher loginRoleMatcher) {
         this.loginRoleMatcher = loginRoleMatcher;
@@ -43,6 +44,18 @@ public class RoleMatchAuthenticationSuccessHandler implements AuthenticationSucc
             return;
         }
 
+        // シングルトンBeanのため、共有フィールドのdefaultTargetUrlをリクエストごとに
+        // 書き換えると同時ログイン時に競合する。ロールに応じたリダイレクト先の決定のため、
+        // リクエストごとにローカルインスタンスを生成する（生成コストは軽微）。
+        SavedRequestAwareAuthenticationSuccessHandler delegate = new SavedRequestAwareAuthenticationSuccessHandler();
+        delegate.setDefaultTargetUrl(defaultTargetUrlFor(authentication));
+        delegate.setAlwaysUseDefaultTargetUrl(false);
         delegate.onAuthenticationSuccess(request, response, authentication);
+    }
+
+    private String defaultTargetUrlFor(Authentication authentication) {
+        boolean isSeller = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_SELLER"));
+        return isSeller ? SELLER_DEFAULT_TARGET : BUYER_DEFAULT_TARGET;
     }
 }

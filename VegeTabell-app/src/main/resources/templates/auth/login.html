@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ログイン | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-logo">🥬</div>
+    <h1 class="auth-title">VegeTabell</h1>
+    <p class="auth-tagline">おいしくおトクに、食品ロスをゼロへ</p>
+
+    <p class="auth-message success" th:if="${param.registered != null}">
+        登録が完了しました。ログインしてください
+    </p>
+    <p class="auth-message success" th:if="${param.logout != null}">
+        ログアウトしました
+    </p>
+    <p class="auth-message error" th:if="${param.error != null}">
+        メールアドレス、パスワード、またはアカウント種別が正しくありません
+    </p>
+
+    <form th:action="@{/login}" method="post">
+        <div class="role-toggle">
+            <input type="radio" id="role-buyer" name="role" value="buyer" checked>
+            <label for="role-buyer">買い手 (一般ユーザー)</label>
+            <input type="radio" id="role-seller" name="role" value="seller">
+            <label for="role-seller">売り手 (お店の方)</label>
+        </div>
+
+        <div class="field">
+            <label for="username">メールアドレス</label>
+            <input type="email" id="username" name="username" placeholder="example@mail.com" required>
+        </div>
+
+        <div class="field">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn-primary">ログインする</button>
+        <span class="auth-link-muted">パスワードをお忘れですか？</span>
+    </form>
+
+    <div class="auth-divider">または</div>
+    <p class="auth-footer-link">
+        アカウントをお持ちでない方：<a th:href="@{/signup}">新規登録</a>
+    </p>
+</div>
+</body>
+</html>

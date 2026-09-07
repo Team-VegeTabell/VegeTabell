@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新規登録 | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-logo">🥬</div>
+    <h1 class="auth-title">VegeTabell</h1>
+    <p class="auth-tagline">おいしくおトクに、食品ロスをゼロへ</p>
+
+    <form th:action="@{/signup}" th:object="${signupForm}" method="post">
+        <div class="role-toggle">
+            <input type="radio" id="role-buyer" th:field="*{role}" value="BUYER">
+            <label for="role-buyer">買い手 (一般ユーザー)</label>
+            <input type="radio" id="role-seller" th:field="*{role}" value="SELLER">
+            <label for="role-seller">売り手 (お店の方)</label>
+        </div>
+
+        <div class="field">
+            <label for="email">メールアドレス</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="example@mail.com">
+            <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+        </div>
+
+        <div class="field">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" th:field="*{password}">
+            <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+        </div>
+
+        <div class="field">
+            <label for="displayName">表示名</label>
+            <input type="text" id="displayName" th:field="*{displayName}">
+            <p class="field-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></p>
+        </div>
+
+        <div class="seller-fields" id="sellerFields" th:hidden="${signupForm.role == null or signupForm.role.name() != 'SELLER'}">
+            <div class="field">
+                <label for="shopName">店舗名</label>
+                <input type="text" id="shopName" th:field="*{shopName}">
+                <p class="field-error" th:if="${#fields.hasErrors('shopName')}" th:errors="*{shopName}"></p>
+            </div>
+
+            <div class="field">
+                <label for="address">住所</label>
+                <input type="text" id="address" th:field="*{address}">
+                <p class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
+            </div>
+
+            <div class="field">
+                <label for="latitude">緯度</label>
+                <input type="number" step="any" id="latitude" th:field="*{latitude}">
+                <p class="field-error" th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}"></p>
+            </div>
+
+            <div class="field">
+                <label for="longitude">経度</label>
+                <input type="number" step="any" id="longitude" th:field="*{longitude}">
+                <p class="field-error" th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}"></p>
+            </div>
+
+            <div class="field">
+                <label for="pickupNote">受け取り場所の説明</label>
+                <textarea id="pickupNote" th:field="*{pickupNote}" rows="3"></textarea>
+                <p class="field-error" th:if="${#fields.hasErrors('pickupNote')}" th:errors="*{pickupNote}"></p>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">登録する</button>
+    </form>
+
+    <p class="auth-footer-link" style="margin-top: 24px;">
+        既にアカウントをお持ちの方：<a th:href="@{/login}">ログイン</a>
+    </p>
+</div>
+
+<script th:inline="none">
+    document.querySelectorAll('input[name="role"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            var sellerFields = document.getElementById('sellerFields');
+            var isSeller = document.querySelector('input[name="role"]:checked').value === 'SELLER';
+            sellerFields.hidden = !isSeller;
+        });
+    });
+</script>
+</body>
+</html>
