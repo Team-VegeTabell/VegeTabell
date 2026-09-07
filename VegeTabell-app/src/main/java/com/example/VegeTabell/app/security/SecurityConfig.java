@@ -2,6 +2,7 @@ package com.example.VegeTabell.app.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,6 +31,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/signup", "/error",
                         "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                // /reservations/{id}/cancel のみ買い手・売り手どちらもアクセスしうるため、
+                // ロールでの制御ではなくコントローラー側の所有者チェックに委ねる（auth-design.md §2の補足に対応）。
+                // より広い /reservations/** のBUYER限定ルールより先に評価させる必要がある。
+                .requestMatchers(HttpMethod.POST, "/reservations/*/cancel").authenticated()
                 .requestMatchers("/", "/products/**", "/reservations/**", "/mypage").hasRole("BUYER")
                 .requestMatchers("/seller/**").hasRole("SELLER")
                 .requestMatchers("/notifications/**").authenticated()

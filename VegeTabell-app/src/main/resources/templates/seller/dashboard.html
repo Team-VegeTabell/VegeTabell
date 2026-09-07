@@ -24,6 +24,27 @@
         </div>
     </div>
 
+    <p class="auth-message error" th:if="${cancelError != null}" th:text="${cancelError}"></p>
+
+    <h2 class="section-title">予約一覧</h2>
+    <div class="reservation-list">
+        <p class="empty-state" th:if="${#lists.isEmpty(reservations)}">現在、予約は入っていません</p>
+        <div class="reservation-card" th:each="r : ${reservations}">
+            <div>
+                <p class="reservation-product-name" th:text="${r.productName}">商品名</p>
+                <p class="reservation-meta">
+                    <span th:text="${r.buyerDisplayName}">買い手名</span>
+                    <span th:text="${r.quantity} + '点'">1点</span>
+                    <span th:text="${r.pickupWindowLabel}">本日16:00〜19:00まで</span>
+                </p>
+            </div>
+            <form th:action="@{/reservations/{id}/cancel(id=${r.id})}" method="post"
+                  onsubmit="return confirm('この予約をキャンセルしますか？');">
+                <button type="submit" class="btn-link btn-link-danger">キャンセルする</button>
+            </form>
+        </div>
+    </div>
+
     <div class="section-title-row">
         <h2 class="section-title">現在の出品状況</h2>
         <a th:href="@{/seller/products}" class="section-link">すべて見る</a>

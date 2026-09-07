@@ -52,10 +52,20 @@
         </p>
     </div>
 
-    <!-- Step7で予約フォーム（数量選択含む）をここに実装。POST /products/{id}/reservations は未実装 -->
-    <form th:if="${product.reservable}" th:action="@{/products/{id}/reservations(id=${product.id})}" method="post">
-        <button type="submit" class="btn-fab">受け取りを予約する</button>
-    </form>
+    <div class="detail-section" th:if="${product.reservable}">
+        <form th:action="@{/products/{id}/reservations(id=${product.id})}" th:object="${reservationForm}" method="post">
+            <div class="field" th:if="${product.remainingQuantity >= 2}">
+                <label for="quantity">数量</label>
+                <select id="quantity" th:field="*{quantity}">
+                    <option th:each="q : ${#numbers.sequence(1, product.remainingQuantity)}"
+                            th:value="${q}" th:text="${q}">1</option>
+                </select>
+            </div>
+            <input type="hidden" th:if="${product.remainingQuantity < 2}" th:field="*{quantity}">
+            <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
+            <button type="submit" class="btn-fab">受け取りを予約する</button>
+        </form>
+    </div>
     <button type="button" class="btn-fab btn-fab-disabled" th:unless="${product.reservable}" disabled
             th:text="${product.statusLabel}">完売しました</button>
 </div>

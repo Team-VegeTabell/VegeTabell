@@ -1,9 +1,11 @@
 package com.example.VegeTabell.app.controller;
 
+import com.example.VegeTabell.app.dto.SellerReservationView;
 import com.example.VegeTabell.app.entity.Category;
 import com.example.VegeTabell.app.entity.Product;
 import com.example.VegeTabell.app.entity.Shop;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
+import com.example.VegeTabell.app.entity.type.ReservationStatus;
 import com.example.VegeTabell.app.form.ProductForm;
 import com.example.VegeTabell.app.repository.CategoryRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
@@ -59,6 +61,11 @@ public class SellerController {
         model.addAttribute("products", productRepository.findByShopIdOrderByCreatedAtDesc(shop.getId()));
         model.addAttribute("todayListedCount",
                 productRepository.countByShopIdAndCreatedAtGreaterThanEqual(shop.getId(), startOfToday));
+        model.addAttribute("reservations", reservationRepository
+                .findByProductShopIdAndStatusOrderByReservedAtDesc(shop.getId(), ReservationStatus.RESERVED)
+                .stream()
+                .map(SellerReservationView::from)
+                .toList());
         return "seller/dashboard";
     }
 
