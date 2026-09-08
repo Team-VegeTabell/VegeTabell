@@ -39,4 +39,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	// テストクラスごとに@SpringBootTestの実DBコンテキストが並行して残ることがあり、
+	// Supabase Session poolerの上限（pool_size:15）を超えて接続エラーになることがあるため、
+	// テスト実行時のみHikariプール上限を絞る（bootRun時のapplication.propertiesの値には影響しない）。
+	systemProperty 'spring.datasource.hikari.maximum-pool-size', '1'
 }

@@ -346,4 +346,81 @@ class SellerControllerTest {
                         .param("expiryAt", LocalDateTime.now().plusDays(1).toString()))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void getDashboard_includesCompletedRevenueStat() throws Exception {
+        Shop shop = shopOwnedBySeller(10L, 1L);
+        when(shopRepository.findByUserId(1L)).thenReturn(Optional.of(shop));
+        when(productRepository.findByShopIdOrderByCreatedAtDesc(10L)).thenReturn(List.of());
+        when(productRepository.countByShopIdAndCreatedAtGreaterThanEqual(anyLong(), any(Instant.class))).thenReturn(0L);
+        when(reservationRepository.sumTotalPriceByProductShopIdAndStatus(10L,
+                com.example.VegeTabell.app.entity.type.ReservationStatus.COMPLETED)).thenReturn(1840);
+
+        mockMvc.perform(get("/seller/dashboard").with(user(sellerPrincipal(1L))))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("¥1,840")));
+    }
+
+    @Test
+    void getSettings_prefillsFormFromShop() throws Exception {
+        Shop shop = shopOwnedBySeller(10L, 1L);
+        shop.setAddress("東京都世田谷区1-2-3");
+        shop.setLatitude(new java.math.BigDecimal("35.646100"));
+        shop.setLongitude(new java.math.BigDecimal("139.653400"));
+        when(shopRepository.findByUserId(1L)).thenReturn(Optional.of(shop));
+
+        mockMvc.perform(get("/seller/settings").with(user(sellerPrincipal(1L))))
+                .andExpect(status().isOk())
+                .andExpect(view().name("seller/settings"))
+                .andExpect(content().string(org.hamcrest.Matchers.allOf(
+                        org.hamcrest.Matchers.containsString("大地の恵み 八百屋"),
+                        org.hamcrest.Matchers.containsString("東京都世田谷区1-2-3")
+                )));
+    }
+
+    @Test
+    void postSettings_happyPath_updatesShopAndRedirects() throws Exception {
+        Shop shop = shopOwnedBySeller(10L, 1L);
+        when(shopRepository.findByUserId(1L)).thenReturn(Optional.of(shop));
+
+        mockMvc.perform(post("/seller/settings")
+                        .with(user(sellerPrincipal(1L)))
+                        .param("shopName", "新しい店舗名")
+                        .param("address", "東京都世田谷区4-5-6")
+                        .param("latitude", "35.6")
+                        .param("longitude", "139.7")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/seller/settings"));
+
+        verify(shopRepository).save(org.mockito.ArgumentMatchers.argThat(saved ->
+                saved.getShopName().equals("新しい店舗名") && saved.getAddress().equals("東京都世田谷区4-5-6")));
+    }
+
+    @Test
+    void postSettings_blankShopName_reRendersWithFieldError() throws Exception {
+        mockMvc.perform(post("/seller/settings")
+                        .with(user(sellerPrincipal(1L)))
+                        .param("shopName", "")
+                        .param("address", "東京都世田谷区4-5-6")
+                        .param("latitude", "35.6")
+                        .param("longitude", "139.7")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("seller/settings"))
+                .andExpect(model().attributeHasFieldErrors("shopForm", "shopName"));
+
+        verify(shopRepository, never()).save(any());
+    }
+
+    @Test
+    void postSettings_withoutCsrf_isForbidden() throws Exception {
+        mockMvc.perform(post("/seller/settings")
+                        .with(user(sellerPrincipal(1L)))
+                        .param("shopName", "新しい店舗名")
+                        .param("address", "東京都世田谷区4-5-6")
+                        .param("latitude", "35.6")
+                        .param("longitude", "139.7"))
+                .andExpect(status().isForbidden());
+    }
 }

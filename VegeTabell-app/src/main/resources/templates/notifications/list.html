@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="buyer-page">
+<div class="buyer-page page-with-nav">
     <div class="page-header">
         <a th:href="@{${homeUrl}}" class="back-link">←</a>
         <h1 class="page-title">通知</h1>
@@ -27,6 +27,13 @@
                 </span>
             </button>
         </form>
+    </div>
+
+    <div th:if="${navRole.name() == 'BUYER'}">
+        <div th:replace="~{fragments/nav :: buyerNav('notifications')}"></div>
+    </div>
+    <div th:if="${navRole.name() == 'SELLER'}">
+        <div th:replace="~{fragments/nav :: sellerNav('notifications')}"></div>
     </div>
 </div>
 </body>

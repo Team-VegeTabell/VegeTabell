@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>マイページ | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="buyer-page page-with-nav">
+    <div class="page-header">
+        <h1 class="page-title">マイページ</h1>
+    </div>
+
+    <h2 class="section-title">予約履歴</h2>
+    <p class="empty-state" th:if="${#lists.isEmpty(reservations)}">まだ予約はありません</p>
+
+    <div class="reservation-list">
+        <a class="reservation-card" th:each="r : ${reservations}" th:href="@{/reservations/{id}(id=${r.id})}">
+            <div>
+                <p class="reservation-product-name" th:text="${r.productName}">商品名</p>
+                <p class="reservation-meta">
+                    <span th:text="${r.shopName}">店舗名</span>
+                    <span th:text="${r.quantity} + '点'">1点</span>
+                    <span th:text="${r.pickupWindowLabel}">本日16:00〜19:00まで</span>
+                </p>
+            </div>
+            <span class="status-badge" th:text="${r.statusLabel}">予約中</span>
+        </a>
+    </div>
+
+    <div th:replace="~{fragments/nav :: buyerNav('mypage')}"></div>
+</div>
+</body>
+</html>

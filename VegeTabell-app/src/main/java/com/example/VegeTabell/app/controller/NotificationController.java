@@ -36,6 +36,7 @@ public class NotificationController {
         // "/"は買い手専用のためSecurityConfig上403になる。ロールに応じた戻り先をここで解決する。
         model.addAttribute("homeUrl", principal.getUser().getRole() == UserRole.SELLER
                 ? "/seller/dashboard" : "/products");
+        model.addAttribute("navRole", principal.getUser().getRole());
         return "notifications/list";
     }
 

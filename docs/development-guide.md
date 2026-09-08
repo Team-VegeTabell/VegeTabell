@@ -35,7 +35,7 @@
 - [x] Step7: 予約機能・キャンセル（`ReservationController`/`ReservationService`/`ReservationForm`、`/products/{id}/reservations`・`/reservations/{id}`・`/reservations/{id}/cancel`を実装。数量選択UI、在庫減算/復元、sold_out自動化、売り手ダッシュボードへの予約一覧＋キャンセル追加。テスト2クラス17件＋実DBへの手動確認で検証） (完了: 2026-09-07)
 - [x] Step8: 通知機能（`NotificationController`/`NotificationView`、`/notifications`・`/notifications/{id}/read`を実装。予約作成/キャンセル時に`ReservationService`から通知を生成、買い手ホーム・売り手ダッシュボードに未読バッジ付きベルアイコンを追加。`NotificationControllerTest`6件を新規追加、`ReservationServiceTest`に通知生成の検証3件を追加＋実DBへの手動確認で検証） (完了: 2026-09-08)
 - [x] Step9: バッチ処理（`@Scheduled`）（`BatchService`/`SchedulingConfig`、5分おきに①期限切れ商品の`expired`化②受取期限超過予約の`completed`化③`pickup_reminder`④`stock_expiring_warning`通知生成を実装。通知生成ロジックは`ReservationService`から`NotificationService`に切り出して共通化。テスト2クラス7件を新規追加＋`ReservationServiceTest`を`NotificationService`利用に更新） (完了: 2026-09-08)
-- [ ] Step10: ワイヤーフレーム・画面遷移図との突合せ、レスポンシブ調整
+- [x] Step10: ワイヤーフレーム・画面遷移図との突合せ、レスポンシブ調整（共通下部ナビ`fragments/nav.html`（買い手：ホーム/さがす/お知らせ/マイページ、売り手：ホーム/出品リスト/通知/設定）を新設し6画面に組み込み。買い手マイページ（`/mypage`、予約履歴）・売り手設定（`/seller/settings`、店舗情報編集）を新規実装。売り手ダッシュボードに「レスキュー完了（売上）」カードを追加。`style.css`に`@media`ブレークポイント（768px/1024px）と狭幅崩れ修正を追加。テスト2クラス追加・実DB(Supabase)への手動確認で検証） (完了: 2026-09-08)
 
 ---
 
@@ -162,6 +162,19 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - **通知生成ロジックの共通化**：`ReservationService`内にあった通知生成の`private notify(...)`メソッドを`NotificationService.create(...)`として切り出し、`ReservationService`とバッチ処理の両方から利用する形にリファクタリングした
 - **`new_product_nearby`は引き続き対象外**：買い手の位置情報を保存する仕組みが無い（Step6から続く未対応事項）ため、Step9でも実装していない
 - **画面側の変更なし**：`notifications/list.html`は通知タイプに依らずtitle/bodyを表示する汎用UIのため、新しい通知タイプ追加に伴うテンプレート変更は不要だった
+
+### Step10実装時の判断・申し送り事項
+
+- **共通下部ナビ**：`templates/fragments/nav.html`に買い手用(`buyerNav`)・売り手用(`sellerNav`)の2フラグメントを新設し、`products/list.html`・`mypage.html`・`seller/dashboard.html`・`seller/products.html`・`seller/settings.html`・`notifications/list.html`（役割に応じて出し分け）に組み込んだ。ログイン画面・商品詳細・予約確認・出品フォームなど「前進型」の単機能画面には設置していない（ワイヤーフレームにも下部タブが無いことを確認済み）
+- **「さがす」タブの簡略化**：検索フォームは`/products`に既にインライン実装されているため、「さがす」タブは独立ルートを持たず「ホーム」と同じ`/products`へリンクする（アクティブ表示のみ別）。新規に検索専用画面は追加していない
+- **Thymeleafの`th:if`＋`th:replace`併用の不具合を発見・回避**：同一タグに`th:if`と`th:replace`を書くと、条件に関わらず両方のフラグメントが描画されてしまう不具合を実機確認で発見した（`notifications/list.html`で買い手・売り手両方のナビが同時に表示されてしまった）。`th:if`を外側の`<div>`に分離し、内側の`<div>`で`th:replace`する形（`<div th:if="..."><div th:replace="..."></div></div>`）に修正して解消した。他画面で同様のパターンを追加する際は要注意
+- **買い手マイページ（`/mypage`）**：予約履歴の一覧のみを表示する読み取り専用画面として実装（`MyPageController`/`MyPageReservationView`/`ReservationRepository.findByBuyerIdOrderByReservedAtDesc`）。詳細・キャンセルは既存の`/reservations/{id}`にリンクして委譲し、機能重複を避けた
+- **売り手設定（`/seller/settings`）**：`Shop`の店舗名・住所・緯度経度・受け取り場所の説明を編集できる最小限のフォームとして実装（`ShopForm`、`SellerController`に追加）。写真アップロードや営業時間など、ワイヤーフレームに無い項目は追加していない
+- **売上集計の期間**：「レスキュー完了（売上）」カードは**全期間の`COMPLETED`予約の合計**とした（`ReservationRepository.sumTotalPriceByProductShopIdAndStatus`）。「本日出品アイテム」が当日区切りなのに対し、売上は累計の実績を示す指標である方がオーナー視点で分かりやすいと判断した。`RESERVED`（未受取）は実現していない売上のため含めない
+- **`design/wireframes/seller-listing.png`のラベル不一致**：このワイヤーフレーム画像は実際には「新規出品フォーム」（`seller/product-form.html`）の絵であり、「出品リスト」（`seller/products.html`）のものではないことが実機確認で判明した。コード側の対応は不要のため、ドキュメント上の注記のみに留めた
+- **テスト実行時のDB接続エラー対策**：テストクラスが増えるにつれ、`@SpringBootTest`ごとに開く実DB(Supabase Session pooler)接続が積み重なり、pooler側の上限（pool_size:15）を超えて`EMAXCONNSESSION`エラーで断続的にテストが失敗する事象が発生した。`build.gradle`の`test`タスクに`spring.datasource.hikari.maximum-pool-size=1`をシステムプロパティとして設定し、テスト実行時のみ各コンテキストの接続数を絞ることで解消した（`bootRun`時の`application.properties`の値には影響しない）。テストクラスが今後さらに増える場合は同様の対応強化を検討すること
+- **距離・現在地表示（"○m"）は引き続き対象外**：Step6から続く未対応事項のため、Step10でも着手していない
+- **レスポンシブ確認の制約**：ブラウザ自動操作ツールの制約でウィンドウの実サイズ変更ができなかったため、768px/1024pxのブレークポイントは`window.matchMedia`・`getComputedStyle`によるJS上の検証（実際にコンテナ幅・グリッド列数が切り替わることを確認）で代替した。実機（スマホ・タブレット）での見た目の最終確認は別途行うこと
 
 ---
 
