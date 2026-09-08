@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="seller-page">
+<div class="seller-page page-with-nav">
     <div class="page-header">
         <a th:href="@{/seller/dashboard}" class="back-link">←</a>
         <h1 class="page-title">出品リスト</h1>
@@ -22,7 +22,9 @@
         </div>
     </div>
 
-    <a th:href="@{/seller/products/new}" class="btn-fab">＋ 商品を登録する</a>
+    <a th:href="@{/seller/products/new}" class="btn-fab btn-fab-above-nav">＋ 商品を登録する</a>
+
+    <div th:replace="~{fragments/nav :: sellerNav('products')}"></div>
 </div>
 </body>
 </html>

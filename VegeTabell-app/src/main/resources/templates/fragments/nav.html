@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="bottom-nav" th:fragment="buyerNav(active)">
+    <a th:href="@{/products}" class="bottom-nav-item" th:classappend="${active == 'home'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">ホーム</span>
+    </a>
+    <a th:href="@{/products}" class="bottom-nav-item" th:classappend="${active == 'search'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">🔍</span><span class="bottom-nav-label">さがす</span>
+    </a>
+    <a th:href="@{/notifications}" class="bottom-nav-item" th:classappend="${active == 'notifications'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">🔔</span><span class="bottom-nav-label">お知らせ</span>
+    </a>
+    <a th:href="@{/mypage}" class="bottom-nav-item" th:classappend="${active == 'mypage'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">👤</span><span class="bottom-nav-label">マイページ</span>
+    </a>
+</nav>
+
+<nav class="bottom-nav" th:fragment="sellerNav(active)">
+    <a th:href="@{/seller/dashboard}" class="bottom-nav-item" th:classappend="${active == 'home'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">ホーム</span>
+    </a>
+    <a th:href="@{/seller/products}" class="bottom-nav-item" th:classappend="${active == 'products'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">📋</span><span class="bottom-nav-label">出品リスト</span>
+    </a>
+    <a th:href="@{/notifications}" class="bottom-nav-item" th:classappend="${active == 'notifications'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">🔔</span><span class="bottom-nav-label">通知</span>
+    </a>
+    <a th:href="@{/seller/settings}" class="bottom-nav-item" th:classappend="${active == 'settings'} ? 'bottom-nav-item-active' : ''">
+        <span class="bottom-nav-icon">⚙️</span><span class="bottom-nav-label">設定</span>
+    </a>
+</nav>
+</body>
+</html>

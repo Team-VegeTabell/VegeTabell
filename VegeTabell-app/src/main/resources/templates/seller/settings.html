@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>店舗設定 | VegeTabell</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="seller-page page-with-nav">
+    <div class="page-header">
+        <h1 class="page-title">店舗設定</h1>
+    </div>
+
+    <form th:action="@{/seller/settings}" th:object="${shopForm}" method="post">
+        <div class="field">
+            <label for="shopName">店舗名</label>
+            <input type="text" id="shopName" th:field="*{shopName}">
+            <p class="field-error" th:if="${#fields.hasErrors('shopName')}" th:errors="*{shopName}"></p>
+        </div>
+
+        <div class="field">
+            <label for="address">住所</label>
+            <input type="text" id="address" th:field="*{address}">
+            <p class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label for="latitude">緯度</label>
+                <input type="number" step="any" id="latitude" th:field="*{latitude}">
+                <p class="field-error" th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}"></p>
+            </div>
+            <div class="field">
+                <label for="longitude">経度</label>
+                <input type="number" step="any" id="longitude" th:field="*{longitude}">
+                <p class="field-error" th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}"></p>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="pickupNote">受け取り場所の説明（任意）</label>
+            <textarea id="pickupNote" th:field="*{pickupNote}" rows="3"></textarea>
+            <p class="field-error" th:if="${#fields.hasErrors('pickupNote')}" th:errors="*{pickupNote}"></p>
+        </div>
+
+        <button type="submit" class="btn-primary">保存する</button>
+    </form>
+
+    <div th:replace="~{fragments/nav :: sellerNav('settings')}"></div>
+</div>
+</body>
+</html>

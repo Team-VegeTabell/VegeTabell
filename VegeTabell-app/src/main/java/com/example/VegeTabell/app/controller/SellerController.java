@@ -7,6 +7,7 @@ import com.example.VegeTabell.app.entity.Shop;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.entity.type.ReservationStatus;
 import com.example.VegeTabell.app.form.ProductForm;
+import com.example.VegeTabell.app.form.ShopForm;
 import com.example.VegeTabell.app.repository.CategoryRepository;
 import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
@@ -72,6 +73,8 @@ public class SellerController {
                 .toList());
         model.addAttribute("unreadNotificationCount",
                 notificationRepository.countByUserIdAndReadFalse(principal.getUser().getId()));
+        model.addAttribute("completedRevenue",
+                reservationRepository.sumTotalPriceByProductShopIdAndStatus(shop.getId(), ReservationStatus.COMPLETED));
         return "seller/dashboard";
     }
 
@@ -151,6 +154,32 @@ public class SellerController {
 
         productRepository.delete(product);
         return "redirect:/seller/products";
+    }
+
+    @GetMapping("/settings")
+    public String settingsForm(Model model, @AuthenticationPrincipal CustomUserDetails principal) {
+        Shop shop = currentShop(principal);
+        model.addAttribute("shopForm", ShopForm.from(shop));
+        return "seller/settings";
+    }
+
+    @PostMapping("/settings")
+    public String updateSettings(@Valid @ModelAttribute("shopForm") ShopForm form,
+                                  BindingResult bindingResult,
+                                  @AuthenticationPrincipal CustomUserDetails principal) {
+        if (bindingResult.hasErrors()) {
+            return "seller/settings";
+        }
+
+        Shop shop = currentShop(principal);
+        shop.setShopName(form.getShopName());
+        shop.setAddress(form.getAddress());
+        shop.setLatitude(form.getLatitude());
+        shop.setLongitude(form.getLongitude());
+        shop.setPickupNote(form.getPickupNote());
+        shopRepository.save(shop);
+
+        return "redirect:/seller/settings";
     }
 
     private Shop currentShop(CustomUserDetails principal) {

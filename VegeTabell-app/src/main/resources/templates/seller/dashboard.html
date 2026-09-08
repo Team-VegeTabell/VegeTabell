@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="seller-page">
+<div class="seller-page page-with-nav">
     <div class="seller-header">
         <div class="shop-avatar">🏪</div>
         <div class="seller-header-name">
@@ -25,6 +25,10 @@
         <div class="stat-card">
             <p class="stat-label">本日出品アイテム</p>
             <p class="stat-value" th:text="${todayListedCount} + ' 点'">0 点</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">レスキュー完了（売上）</p>
+            <p class="stat-value" th:text="'¥' + ${#numbers.formatInteger(completedRevenue, 1, 'COMMA')}">¥0</p>
         </div>
     </div>
 
@@ -61,7 +65,9 @@
         </div>
     </div>
 
-    <a th:href="@{/seller/products/new}" class="btn-fab">＋ 商品を登録する</a>
+    <a th:href="@{/seller/products/new}" class="btn-fab btn-fab-above-nav">＋ 商品を登録する</a>
+
+    <div th:replace="~{fragments/nav :: sellerNav('home')}"></div>
 </div>
 </body>
 </html>

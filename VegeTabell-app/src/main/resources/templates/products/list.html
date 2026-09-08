@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="buyer-page">
+<div class="buyer-page page-with-nav">
     <div class="home-header">
         <h1 class="home-title">VegeTabell</h1>
         <a th:href="@{/notifications}" class="bell-button">
@@ -55,6 +55,8 @@
             </div>
         </a>
     </div>
+
+    <div th:replace="~{fragments/nav :: buyerNav('home')}"></div>
 </div>
 </body>
 </html>

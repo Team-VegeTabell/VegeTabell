@@ -927,3 +927,140 @@ body {
   color: var(--color-muted);
   margin: 0;
 }
+
+/* ---- 共通の下部ナビゲーション（Step10） ---- */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.bottom-nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottom-nav-item-active {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.page-with-nav {
+  padding-bottom: 160px;
+}
+
+.btn-fab-above-nav {
+  bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+}
+
+/* ---- 狭幅画面での崩れ修正（Step10） ---- */
+.reservation-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.reservation-card > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.reservation-product-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reservation-meta {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.field-row {
+  flex-wrap: wrap;
+}
+
+.field-row .field {
+  min-width: 140px;
+}
+
+.stat-cards {
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  min-width: 140px;
+}
+
+/* ---- レスポンシブ調整（Step10） ---- */
+@media (min-width: 768px) {
+  .auth-page {
+    max-width: 480px;
+  }
+
+  .seller-page,
+  .buyer-page {
+    max-width: 720px;
+  }
+
+  .buyer-product-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .buyer-product-card {
+    flex-direction: column;
+  }
+
+  .buyer-product-image {
+    width: 100%;
+    height: 140px;
+  }
+
+  .product-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bottom-nav,
+  .btn-fab {
+    max-width: 720px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .seller-page,
+  .buyer-page {
+    max-width: 960px;
+  }
+
+  .product-list,
+  .buyer-product-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .bottom-nav,
+  .btn-fab {
+    max-width: 960px;
+  }
+}
