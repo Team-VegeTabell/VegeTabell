@@ -1,6 +1,5 @@
 package com.example.VegeTabell.app.service;
 
-import com.example.VegeTabell.app.entity.Notification;
 import com.example.VegeTabell.app.entity.Product;
 import com.example.VegeTabell.app.entity.Reservation;
 import com.example.VegeTabell.app.entity.Shop;
@@ -9,7 +8,6 @@ import com.example.VegeTabell.app.entity.type.CanceledBy;
 import com.example.VegeTabell.app.entity.type.NotificationType;
 import com.example.VegeTabell.app.entity.type.ProductStatus;
 import com.example.VegeTabell.app.entity.type.ReservationStatus;
-import com.example.VegeTabell.app.repository.NotificationRepository;
 import com.example.VegeTabell.app.repository.ProductRepository;
 import com.example.VegeTabell.app.repository.ReservationRepository;
 import org.junit.jupiter.api.Test;
@@ -40,7 +38,7 @@ class ReservationServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private NotificationRepository notificationRepository;
+    private NotificationService notificationService;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -96,17 +94,19 @@ class ReservationServiceTest {
         Product product = product(3);
         User buyer = buyer(9L);
         when(reservationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
-        when(notificationRepository.save(captor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
+        ArgumentCaptor<User> recipientCaptor = ArgumentCaptor.forClass(User.class);
+        ArgumentCaptor<NotificationType> typeCaptor = ArgumentCaptor.forClass(NotificationType.class);
 
         reservationService.reserve(product, buyer, 2);
 
-        List<Notification> notifications = captor.getAllValues();
-        assertEquals(2, notifications.size());
-        assertEquals(NotificationType.RESERVATION_CONFIRMED, notifications.get(0).getType());
-        assertEquals(buyer, notifications.get(0).getUser());
-        assertEquals(NotificationType.NEW_RESERVATION, notifications.get(1).getType());
-        assertEquals(product.getShop().getUser(), notifications.get(1).getUser());
+        verify(notificationService, times(2))
+                .create(recipientCaptor.capture(), typeCaptor.capture(), any(), any(), any(), any());
+        List<User> recipients = recipientCaptor.getAllValues();
+        List<NotificationType> types = typeCaptor.getAllValues();
+        assertEquals(NotificationType.RESERVATION_CONFIRMED, types.get(0));
+        assertEquals(buyer, recipients.get(0));
+        assertEquals(NotificationType.NEW_RESERVATION, types.get(1));
+        assertEquals(product.getShop().getUser(), recipients.get(1));
     }
 
     @Test
@@ -149,15 +149,15 @@ class ReservationServiceTest {
         reservation.setBuyer(buyer(9L));
         reservation.setQuantity(1);
         reservation.setStatus(ReservationStatus.RESERVED);
-        ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
-        when(notificationRepository.save(captor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
+        ArgumentCaptor<User> recipientCaptor = ArgumentCaptor.forClass(User.class);
+        ArgumentCaptor<NotificationType> typeCaptor = ArgumentCaptor.forClass(NotificationType.class);
 
         reservationService.cancel(reservation, CanceledBy.BUYER);
 
-        assertEquals(1, captor.getAllValues().size());
-        Notification notification = captor.getValue();
-        assertEquals(NotificationType.RESERVATION_CANCELED, notification.getType());
-        assertEquals(product.getShop().getUser(), notification.getUser());
+        verify(notificationService, times(1))
+                .create(recipientCaptor.capture(), typeCaptor.capture(), any(), any(), any(), any());
+        assertEquals(NotificationType.RESERVATION_CANCELED, typeCaptor.getValue());
+        assertEquals(product.getShop().getUser(), recipientCaptor.getValue());
     }
 
     @Test
@@ -169,14 +169,13 @@ class ReservationServiceTest {
         reservation.setBuyer(buyer);
         reservation.setQuantity(1);
         reservation.setStatus(ReservationStatus.RESERVED);
-        when(notificationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         reservationService.cancel(reservation, CanceledBy.SELLER);
 
-        verify(notificationRepository, times(1)).save(any());
-        ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
-        verify(notificationRepository).save(captor.capture());
-        assertEquals(buyer, captor.getValue().getUser());
+        ArgumentCaptor<User> recipientCaptor = ArgumentCaptor.forClass(User.class);
+        verify(notificationService, times(1))
+                .create(recipientCaptor.capture(), any(), any(), any(), any(), any());
+        assertEquals(buyer, recipientCaptor.getValue());
     }
 
     @Test

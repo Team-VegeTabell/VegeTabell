@@ -25,4 +25,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                          @Param("categoryId") Long categoryId,
                                          @Param("keywordPattern") String keywordPattern,
                                          @Param("areaPattern") String areaPattern);
+
+    List<Product> findByStatusInAndExpiryAtBefore(List<ProductStatus> statuses, Instant threshold);
+
+    List<Product> findByStatusAndExpiryAtBetween(ProductStatus status, Instant from, Instant to);
 }

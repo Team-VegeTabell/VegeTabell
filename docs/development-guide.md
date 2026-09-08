@@ -34,7 +34,7 @@
 - [x] Step6: 買い手：商品一覧・詳細（`ProductController`/`ProductSummary`/`ProductDetail`、`/`・`/products`・`/products/{id}`を実装。カテゴリ・キーワード・エリア（店舗住所）絞り込み、割引率・残り時間・完売時の予約ボタン無効化に対応。テスト1クラス7件＋実DBへの手動確認で検証） (完了: 2026-09-07)
 - [x] Step7: 予約機能・キャンセル（`ReservationController`/`ReservationService`/`ReservationForm`、`/products/{id}/reservations`・`/reservations/{id}`・`/reservations/{id}/cancel`を実装。数量選択UI、在庫減算/復元、sold_out自動化、売り手ダッシュボードへの予約一覧＋キャンセル追加。テスト2クラス17件＋実DBへの手動確認で検証） (完了: 2026-09-07)
 - [x] Step8: 通知機能（`NotificationController`/`NotificationView`、`/notifications`・`/notifications/{id}/read`を実装。予約作成/キャンセル時に`ReservationService`から通知を生成、買い手ホーム・売り手ダッシュボードに未読バッジ付きベルアイコンを追加。`NotificationControllerTest`6件を新規追加、`ReservationServiceTest`に通知生成の検証3件を追加＋実DBへの手動確認で検証） (完了: 2026-09-08)
-- [ ] Step9: バッチ処理（`@Scheduled`）
+- [x] Step9: バッチ処理（`@Scheduled`）（`BatchService`/`SchedulingConfig`、5分おきに①期限切れ商品の`expired`化②受取期限超過予約の`completed`化③`pickup_reminder`④`stock_expiring_warning`通知生成を実装。通知生成ロジックは`ReservationService`から`NotificationService`に切り出して共通化。テスト2クラス7件を新規追加＋`ReservationServiceTest`を`NotificationService`利用に更新） (完了: 2026-09-08)
 - [ ] Step10: ワイヤーフレーム・画面遷移図との突合せ、レスポンシブ調整
 
 ---
@@ -153,6 +153,15 @@ Session poolerを使う理由：直接接続（`db.<ref>.supabase.co`）はIPv6�
 - **既読化時の遷移先**：通知をタップすると既読化し、関連予約があれば買い手は`/reservations/{id}`へ、売り手は（個別の予約閲覧画面が無いため）`/seller/dashboard`へ遷移する。関連予約が無い通知は`/notifications`に留まる
 - **未読バッジの表示範囲**：ワイヤーフレームに合わせて買い手ホーム（`/products`）と売り手ダッシュボード（`/seller/dashboard`）のみに表示し、共通ヘッダーが無い他の画面（商品詳細・出品フォーム等）には追加していない。全画面共通のナビ構成はStep10で整理する想定
 - **通知一覧の「戻る」リンク**：`/`は買い手専用（`SecurityConfig`でROLE_BUYER限定）のため、売り手が`/notifications`から戻る際に`/`へのリンクだと403になる。`NotificationController`側でログインユーザーのロールに応じた戻り先（`/products`または`/seller/dashboard`）をModelに渡す方式で解決した
+
+### Step9実装時の判断・申し送り事項
+
+- **`pickup_reminder`のタイミング解釈**：Step7の実装で`pickup_start_at`＝予約した瞬間の時刻としているため、db-design.mdの文言通り「受取開始時刻の一定時間前」にリマインドすると実質的に予約直後にしか送られず意味がない。そのためStep9では**「受取期限（`pickup_end_at`）の一定時間前」**に、まだ受け取っていない予約（`status='reserved'`）の買い手へ送る、という実務的な解釈に変更した（チーム確認済み）
+- **しきい値・実行間隔**：`pickup_reminder`は受取期限の1時間前、`stock_expiring_warning`は期限の2時間前（db-design.mdの例示値を採用）をMVP暫定値とした。4つのバッチ（商品期限切れ化・予約完了化・受取リマインド・在庫警告）はいずれも`@Scheduled(cron = "0 */5 * * * *")`で5分おきに実行する。具体的な数値の指定がdocsに無いため、いずれも運用してみて調整可能な暫定値
+- **重複通知防止**：同一の予約／商品に対して同じ通知タイプを二重生成しないよう、`NotificationRepository`に`existsByReservationIdAndType`/`existsByProductIdAndType`を追加し、バッチ実行のたびに既存通知の有無を確認してからのみ生成する方式にした
+- **通知生成ロジックの共通化**：`ReservationService`内にあった通知生成の`private notify(...)`メソッドを`NotificationService.create(...)`として切り出し、`ReservationService`とバッチ処理の両方から利用する形にリファクタリングした
+- **`new_product_nearby`は引き続き対象外**：買い手の位置情報を保存する仕組みが無い（Step6から続く未対応事項）ため、Step9でも実装していない
+- **画面側の変更なし**：`notifications/list.html`は通知タイプに依らずtitle/bodyを表示する汎用UIのため、新しい通知タイプ追加に伴うテンプレート変更は不要だった
 
 ---
 
