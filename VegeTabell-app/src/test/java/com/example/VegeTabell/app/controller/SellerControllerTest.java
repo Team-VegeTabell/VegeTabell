@@ -379,6 +379,19 @@ class SellerControllerTest {
     }
 
     @Test
+    void getSettings_showsLogoutButton() throws Exception {
+        Shop shop = shopOwnedBySeller(10L, 1L);
+        when(shopRepository.findByUserId(1L)).thenReturn(Optional.of(shop));
+
+        mockMvc.perform(get("/seller/settings").with(user(sellerPrincipal(1L))))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.allOf(
+                        org.hamcrest.Matchers.containsString("action=\"/logout\""),
+                        org.hamcrest.Matchers.containsString("ログアウト")
+                )));
+    }
+
+    @Test
     void postSettings_happyPath_updatesShopAndRedirects() throws Exception {
         Shop shop = shopOwnedBySeller(10L, 1L);
         when(shopRepository.findByUserId(1L)).thenReturn(Optional.of(shop));
