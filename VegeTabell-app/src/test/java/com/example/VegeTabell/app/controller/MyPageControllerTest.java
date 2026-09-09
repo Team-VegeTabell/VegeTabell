@@ -100,6 +100,19 @@ class MyPageControllerTest {
     }
 
     @Test
+    void mypage_showsLogoutButton() throws Exception {
+        User buyer = buyer(1L);
+        when(reservationRepository.findByBuyerIdOrderByReservedAtDesc(1L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/mypage").with(user(new CustomUserDetails(buyer))))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.allOf(
+                        containsString("action=\"/logout\""),
+                        containsString("ログアウト")
+                )));
+    }
+
+    @Test
     void mypage_sellerPrincipal_isForbidden() throws Exception {
         mockMvc.perform(get("/mypage").with(user(new CustomUserDetails(seller(2L)))))
                 .andExpect(status().isForbidden());

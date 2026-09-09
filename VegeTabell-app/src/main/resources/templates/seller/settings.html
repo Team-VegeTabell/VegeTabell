@@ -47,6 +47,11 @@
         <button type="submit" class="btn-primary">保存する</button>
     </form>
 
+    <h2 class="section-title">アカウント</h2>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-secondary">ログアウト</button>
+    </form>
+
     <div th:replace="~{fragments/nav :: sellerNav('settings')}"></div>
 </div>
 </body>

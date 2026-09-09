@@ -136,6 +136,21 @@ body {
   margin-top: 8px;
 }
 
+.btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
 .auth-link-muted {
   display: block;
   text-align: center;
