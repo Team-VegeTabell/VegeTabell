@@ -11,7 +11,7 @@
     <div class="home-header">
         <h1 class="home-title">VegeTabell</h1>
         <a th:href="@{/notifications}" class="bell-button">
-            🔔
+            <svg th:replace="~{fragments/icons :: icon('bell')}"></svg>
             <span class="bell-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">1</span>
         </a>
     </div>
@@ -25,12 +25,22 @@
 
     <div class="category-pills">
         <a th:href="@{/products(keyword=${keyword},area=${area})}"
-           class="category-pill" th:classappend="${selectedCategory == null} ? 'category-pill-selected' : ''">すべて</a>
+           class="category-pill" th:classappend="${selectedCategory == null} ? 'category-pill-selected' : ''">
+            <span class="category-pill-icon"><svg th:replace="~{fragments/icons :: icon('grid')}"></svg></span><span>すべて</span>
+        </a>
         <a th:each="c : ${categories}"
            th:href="@{/products(category=${c.id},keyword=${keyword},area=${area})}"
            class="category-pill"
-           th:classappend="${selectedCategory != null and selectedCategory == c.id} ? 'category-pill-selected' : ''"
-           th:text="${c.icon} + ' ' + ${c.name}">野菜</a>
+           th:classappend="${selectedCategory != null and selectedCategory == c.id} ? 'category-pill-selected' : ''">
+            <span class="category-pill-icon">
+                <span th:if="${c.name == '野菜'}"><svg th:replace="~{fragments/icons :: icon('leaf')}"></svg></span>
+                <span th:if="${c.name == '果物'}"><svg th:replace="~{fragments/icons :: icon('apple')}"></svg></span>
+                <span th:if="${c.name == 'パン'}"><svg th:replace="~{fragments/icons :: icon('bread')}"></svg></span>
+                <span th:if="${c.name == '惣菜'}"><svg th:replace="~{fragments/icons :: icon('bento')}"></svg></span>
+                <span th:unless="${c.name == '野菜' or c.name == '果物' or c.name == 'パン' or c.name == '惣菜'}" th:text="${c.icon}">🥦</span>
+            </span>
+            <span th:text="${c.name}">野菜</span>
+        </a>
     </div>
 
     <p class="empty-state" th:if="${#lists.isEmpty(products)}">条件に合う商品が見つかりませんでした</p>

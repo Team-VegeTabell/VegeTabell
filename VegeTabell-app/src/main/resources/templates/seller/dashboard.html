@@ -15,7 +15,7 @@
             <p class="shop-role-label">出品アカウント</p>
         </div>
         <a th:href="@{/notifications}" class="bell-button">
-            🔔
+            <svg th:replace="~{fragments/icons :: icon('bell')}"></svg>
             <span class="bell-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">1</span>
         </a>
     </div>
