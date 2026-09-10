@@ -65,5 +65,12 @@
         <button type="submit" class="btn-primary">出品する</button>
     </form>
 </div>
+<script>
+    document.querySelector('form').addEventListener('submit', function () {
+        var submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = '出品中...';
+    });
+</script>
 </body>
 </html>
