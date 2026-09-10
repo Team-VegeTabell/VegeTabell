@@ -489,6 +489,9 @@ body {
 }
 
 .category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
   padding: 10px 16px;
   border-radius: 999px;
@@ -498,6 +501,16 @@ body {
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.category-pill-icon {
+  display: flex;
+  align-items: center;
+}
+
+.category-pill-icon .icon {
+  width: 16px;
+  height: 16px;
 }
 
 .category-pill-selected {
@@ -858,9 +871,14 @@ body {
   height: 40px;
   border-radius: 50%;
   background: var(--color-field-bg);
-  font-size: 18px;
+  color: var(--color-text);
   text-decoration: none;
   flex-shrink: 0;
+}
+
+.bell-button .icon {
+  width: 20px;
+  height: 20px;
 }
 
 .bell-badge {
@@ -971,9 +989,16 @@ body {
   white-space: nowrap;
 }
 
+.icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
 .bottom-nav-icon {
-  font-size: 24px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bottom-nav-label {
