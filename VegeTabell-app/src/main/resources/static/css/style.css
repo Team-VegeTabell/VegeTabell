@@ -18,6 +18,11 @@
   box-sizing: border-box;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -134,11 +139,6 @@ body {
   font-weight: 700;
   cursor: pointer;
   margin-top: 8px;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .btn-secondary {

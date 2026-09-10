@@ -62,15 +62,9 @@
             <p class="field-error" th:if="${#fields.hasErrors('totalQuantity')}" th:errors="*{totalQuantity}"></p>
         </div>
 
-        <button type="submit" class="btn-primary">出品する</button>
+        <button type="submit" class="btn-primary" data-loading-text="出品中...">出品する</button>
     </form>
 </div>
-<script>
-    document.querySelector('form').addEventListener('submit', function () {
-        var submitButton = this.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = '出品中...';
-    });
-</script>
+<script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>

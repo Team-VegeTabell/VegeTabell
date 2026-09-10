@@ -31,10 +31,11 @@
 
     <h2 class="section-title">アカウント</h2>
     <form th:action="@{/logout}" method="post">
-        <button type="submit" class="btn-secondary">ログアウト</button>
+        <button type="submit" class="btn-secondary" data-loading-text="ログアウト中...">ログアウト</button>
     </form>
 
     <div th:replace="~{fragments/nav :: buyerNav('mypage')}"></div>
 </div>
+<script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>

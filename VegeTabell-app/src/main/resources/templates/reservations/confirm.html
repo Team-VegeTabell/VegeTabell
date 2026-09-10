@@ -58,8 +58,9 @@
 
     <form th:if="${reservation.cancelable}" th:action="@{/reservations/{id}/cancel(id=${reservation.id})}" method="post"
           onsubmit="return confirm('この予約をキャンセルしますか？');">
-        <button type="submit" class="btn-link btn-link-danger confirm-cancel-button">予約をキャンセルする</button>
+        <button type="submit" class="btn-link btn-link-danger confirm-cancel-button" data-loading-text="処理中...">予約をキャンセルする</button>
     </form>
 </div>
+<script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>

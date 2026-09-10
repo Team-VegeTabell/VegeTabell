@@ -40,7 +40,7 @@
             <input type="password" id="password" name="password" required>
         </div>
 
-        <button type="submit" class="btn-primary">ログインする</button>
+        <button type="submit" class="btn-primary" data-loading-text="ログイン中...">ログインする</button>
         <span class="auth-link-muted">パスワードをお忘れですか？</span>
     </form>
 
@@ -49,5 +49,6 @@
         アカウントをお持ちでない方：<a th:href="@{/signup}">新規登録</a>
     </p>
 </div>
+<script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>

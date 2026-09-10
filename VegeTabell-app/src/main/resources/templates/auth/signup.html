@@ -70,7 +70,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn-primary">登録する</button>
+        <button type="submit" class="btn-primary" data-loading-text="登録中...">登録する</button>
     </form>
 
     <p class="auth-footer-link" style="margin-top: 24px;">
@@ -78,6 +78,7 @@
     </p>
 </div>
 
+<script th:src="@{/js/form-lock.js}"></script>
 <script th:inline="none">
     document.querySelectorAll('input[name="role"]').forEach(function (radio) {
         radio.addEventListener('change', function () {

@@ -44,15 +44,16 @@
             <p class="field-error" th:if="${#fields.hasErrors('pickupNote')}" th:errors="*{pickupNote}"></p>
         </div>
 
-        <button type="submit" class="btn-primary">保存する</button>
+        <button type="submit" class="btn-primary" data-loading-text="保存中...">保存する</button>
     </form>
 
     <h2 class="section-title">アカウント</h2>
     <form th:action="@{/logout}" method="post">
-        <button type="submit" class="btn-secondary">ログアウト</button>
+        <button type="submit" class="btn-secondary" data-loading-text="ログアウト中...">ログアウト</button>
     </form>
 
     <div th:replace="~{fragments/nav :: sellerNav('settings')}"></div>
 </div>
+<script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>
