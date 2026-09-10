@@ -48,7 +48,7 @@
             </div>
             <form th:action="@{/reservations/{id}/cancel(id=${r.id})}" method="post"
                   onsubmit="return confirm('この予約をキャンセルしますか？');">
-                <button type="submit" class="btn-link btn-link-danger">キャンセルする</button>
+                <button type="submit" class="btn-link btn-link-danger" data-loading-text="処理中...">キャンセルする</button>
             </form>
         </div>
     </div>
@@ -69,5 +69,6 @@
 
     <div th:replace="~{fragments/nav :: sellerNav('home')}"></div>
 </div>
+<script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>
