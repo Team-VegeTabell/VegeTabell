@@ -5,9 +5,6 @@
     <a th:href="@{/products}" class="bottom-nav-item" th:classappend="${active == 'home'} ? 'bottom-nav-item-active' : ''">
         <span class="bottom-nav-icon"><svg th:replace="~{fragments/icons :: icon('home')}"></svg></span><span class="bottom-nav-label">ホーム</span>
     </a>
-    <a th:href="@{/products}" class="bottom-nav-item" th:classappend="${active == 'search'} ? 'bottom-nav-item-active' : ''">
-        <span class="bottom-nav-icon"><svg th:replace="~{fragments/icons :: icon('search')}"></svg></span><span class="bottom-nav-label">さがす</span>
-    </a>
     <a th:href="@{/notifications}" class="bottom-nav-item" th:classappend="${active == 'notifications'} ? 'bottom-nav-item-active' : ''">
         <span class="bottom-nav-icon"><svg th:replace="~{fragments/icons :: icon('bell')}"></svg></span><span class="bottom-nav-label">お知らせ</span>
     </a>
