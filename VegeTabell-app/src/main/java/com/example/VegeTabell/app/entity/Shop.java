@@ -39,10 +39,10 @@ public class Shop {
     @Column(name = "address", nullable = false, length = 255)
     private String address;
 
-    @Column(name = "latitude", nullable = false, precision = 9, scale = 6)
+    @Column(name = "latitude", precision = 9, scale = 6)
     private BigDecimal latitude;
 
-    @Column(name = "longitude", nullable = false, precision = 9, scale = 6)
+    @Column(name = "longitude", precision = 9, scale = 6)
     private BigDecimal longitude;
 
     @Column(name = "pickup_note", columnDefinition = "TEXT")

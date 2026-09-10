@@ -32,7 +32,7 @@
             <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
         </div>
 
-        <div class="field">
+        <div class="field" id="displayNameField" th:hidden="${signupForm.role != null and signupForm.role.name() == 'SELLER'}">
             <label for="displayName">表示名</label>
             <input type="text" id="displayName" th:field="*{displayName}">
             <p class="field-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></p>
@@ -49,18 +49,6 @@
                 <label for="address">住所</label>
                 <input type="text" id="address" th:field="*{address}">
                 <p class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
-            </div>
-
-            <div class="field">
-                <label for="latitude">緯度</label>
-                <input type="number" step="any" id="latitude" th:field="*{latitude}">
-                <p class="field-error" th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}"></p>
-            </div>
-
-            <div class="field">
-                <label for="longitude">経度</label>
-                <input type="number" step="any" id="longitude" th:field="*{longitude}">
-                <p class="field-error" th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}"></p>
             </div>
 
             <div class="field">
@@ -83,8 +71,10 @@
     document.querySelectorAll('input[name="role"]').forEach(function (radio) {
         radio.addEventListener('change', function () {
             var sellerFields = document.getElementById('sellerFields');
+            var displayNameField = document.getElementById('displayNameField');
             var isSeller = document.querySelector('input[name="role"]:checked').value === 'SELLER';
             sellerFields.hidden = !isSeller;
+            displayNameField.hidden = isSeller;
         });
     });
 </script>

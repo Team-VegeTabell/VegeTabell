@@ -35,7 +35,8 @@ public class SignupService {
         user.setEmail(form.getEmail());
         user.setPasswordHash(passwordEncoder.encode(form.getPassword()));
         user.setRole(form.getRole());
-        user.setDisplayName(form.getDisplayName());
+        // 売り手は店舗名の入力だけで済ませるため、表示名は店舗名をそのまま使う。
+        user.setDisplayName(form.getRole() == UserRole.SELLER ? form.getShopName() : form.getDisplayName());
         userRepository.save(user);
 
         if (form.getRole() == UserRole.SELLER) {
@@ -43,8 +44,6 @@ public class SignupService {
             shop.setUser(user);
             shop.setShopName(form.getShopName());
             shop.setAddress(form.getAddress());
-            shop.setLatitude(form.getLatitude());
-            shop.setLongitude(form.getLongitude());
             shop.setPickupNote(form.getPickupNote());
             shopRepository.save(shop);
         }

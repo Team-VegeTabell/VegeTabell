@@ -400,8 +400,6 @@ class SellerControllerTest {
                         .with(user(sellerPrincipal(1L)))
                         .param("shopName", "新しい店舗名")
                         .param("address", "東京都世田谷区4-5-6")
-                        .param("latitude", "35.6")
-                        .param("longitude", "139.7")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/seller/settings"));
@@ -416,8 +414,6 @@ class SellerControllerTest {
                         .with(user(sellerPrincipal(1L)))
                         .param("shopName", "")
                         .param("address", "東京都世田谷区4-5-6")
-                        .param("latitude", "35.6")
-                        .param("longitude", "139.7")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("seller/settings"))
@@ -431,9 +427,7 @@ class SellerControllerTest {
         mockMvc.perform(post("/seller/settings")
                         .with(user(sellerPrincipal(1L)))
                         .param("shopName", "新しい店舗名")
-                        .param("address", "東京都世田谷区4-5-6")
-                        .param("latitude", "35.6")
-                        .param("longitude", "139.7"))
+                        .param("address", "東京都世田谷区4-5-6"))
                 .andExpect(status().isForbidden());
     }
 }
