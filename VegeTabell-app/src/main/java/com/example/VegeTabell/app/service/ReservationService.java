@@ -60,6 +60,18 @@ public class ReservationService {
     }
 
     @Transactional
+    public void complete(Reservation reservation) {
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        reservationRepository.save(reservation);
+
+        Product product = reservation.getProduct();
+        notificationService.create(product.getShop().getUser(), NotificationType.PICKUP_COMPLETED,
+                "商品が受け取られました",
+                reservation.getBuyer().getDisplayName() + "さんが" + product.getName() + "を受け取りました",
+                product, reservation);
+    }
+
+    @Transactional
     public void cancel(Reservation reservation, CanceledBy canceledBy) {
         reservation.setStatus(ReservationStatus.CANCELED);
         reservation.setCanceledBy(canceledBy);

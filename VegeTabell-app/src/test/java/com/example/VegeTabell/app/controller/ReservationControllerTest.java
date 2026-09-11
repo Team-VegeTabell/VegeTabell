@@ -208,6 +208,53 @@ class ReservationControllerTest {
     }
 
     @Test
+    void postComplete_byOwningBuyer_completesAndRedirectsToConfirmation() throws Exception {
+        Product product = onSaleProduct(2);
+        User buyer = buyer(1L);
+        Reservation reservation = reservation(product, buyer, ReservationStatus.RESERVED);
+        when(reservationRepository.findById(500L)).thenReturn(Optional.of(reservation));
+
+        mockMvc.perform(post("/reservations/{id}/complete", 500L)
+                        .with(user(buyerPrincipal(1L)))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/reservations/500"));
+
+        verify(reservationService).complete(reservation);
+    }
+
+    @Test
+    void postComplete_byNonOwner_isForbidden() throws Exception {
+        Product product = onSaleProduct(2);
+        User buyer = buyer(1L);
+        Reservation reservation = reservation(product, buyer, ReservationStatus.RESERVED);
+        when(reservationRepository.findById(500L)).thenReturn(Optional.of(reservation));
+
+        mockMvc.perform(post("/reservations/{id}/complete", 500L)
+                        .with(user(buyerPrincipal(2L)))
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+
+        verify(reservationService, never()).complete(any());
+    }
+
+    @Test
+    void postComplete_alreadyProcessed_doesNotCompleteAgain() throws Exception {
+        Product product = onSaleProduct(2);
+        User buyer = buyer(1L);
+        Reservation reservation = reservation(product, buyer, ReservationStatus.CANCELED);
+        when(reservationRepository.findById(500L)).thenReturn(Optional.of(reservation));
+
+        mockMvc.perform(post("/reservations/{id}/complete", 500L)
+                        .with(user(buyerPrincipal(1L)))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/reservations/500"));
+
+        verify(reservationService, never()).complete(any());
+    }
+
+    @Test
     void postCancel_byOwningBuyer_cancelsAndRedirectsToConfirmation() throws Exception {
         Product product = onSaleProduct(2);
         User buyer = buyer(1L);

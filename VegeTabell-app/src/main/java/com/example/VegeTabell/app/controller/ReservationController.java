@@ -80,6 +80,21 @@ public class ReservationController {
         return "reservations/confirm";
     }
 
+    @PostMapping("/reservations/{id}/complete")
+    public String complete(@PathVariable Long id,
+                            @AuthenticationPrincipal CustomUserDetails principal,
+                            RedirectAttributes redirectAttributes) {
+        Reservation reservation = findOwnedByBuyer(id, principal);
+
+        if (reservation.getStatus() != ReservationStatus.RESERVED) {
+            redirectAttributes.addFlashAttribute("completeError", "この予約は既に処理済みです");
+        } else {
+            reservationService.complete(reservation);
+        }
+
+        return "redirect:/reservations/" + id;
+    }
+
     @PostMapping("/reservations/{id}/cancel")
     public String cancel(@PathVariable Long id,
                           @AuthenticationPrincipal CustomUserDetails principal,

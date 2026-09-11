@@ -75,7 +75,9 @@ DBのテーブル定義は [db-design.md](./db-design.md) を参照。
 - **キャンセル**：買い手・売り手どちらも可能。キャンセル時：
   - `reservations.status = 'canceled'`、`canceled_by`／`canceled_at`を記録
   - 商品の`remaining_quantity`を戻し、期限内であれば`status`を`on_sale`に戻す
-- **受取完了**：`pickup_end_at`を過ぎた時点で、`status = 'reserved'`のままの予約をバッチで`status = 'completed'`に自動更新（売り手による手動操作は不要）
+- **受取完了**：
+  - 買い手が予約詳細画面の「受け取り完了にする」ボタンを押すと、即時`reservations.status = 'completed'`に更新し、売り手に通知（`pickup_completed`）を送る
+  - 押し忘れた場合のフォールバックとして、`pickup_end_at`を過ぎた時点で`status = 'reserved'`のままの予約をバッチで`status = 'completed'`に自動更新（この場合は通知なし）
 
 ---
 
@@ -90,8 +92,3 @@ DBのテーブル定義は [db-design.md](./db-design.md) を参照。
 
 ---
 
-## 申し送り事項（チームで要確認）
-
-- パスワードリセット機能をMVPに含めるか（画面にリンクはあるが機能としては未実装の想定）
-- 予約が入っている商品の削除を禁止する運用で業務が回るか
-- 商品詳細画面への数量選択UIの追加（画面遷移図・ワイヤーフレーム側の対応が必要）
