@@ -25,19 +25,6 @@
             <p class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
         </div>
 
-        <div class="field-row">
-            <div class="field">
-                <label for="latitude">緯度</label>
-                <input type="number" step="any" id="latitude" th:field="*{latitude}">
-                <p class="field-error" th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}"></p>
-            </div>
-            <div class="field">
-                <label for="longitude">経度</label>
-                <input type="number" step="any" id="longitude" th:field="*{longitude}">
-                <p class="field-error" th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}"></p>
-            </div>
-        </div>
-
         <div class="field">
             <label for="pickupNote">受け取り場所の説明（任意）</label>
             <textarea id="pickupNote" th:field="*{pickupNote}" rows="3"></textarea>

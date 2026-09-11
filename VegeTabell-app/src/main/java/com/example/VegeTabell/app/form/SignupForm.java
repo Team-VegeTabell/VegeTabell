@@ -8,8 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 public class SignupForm {
@@ -27,7 +25,7 @@ public class SignupForm {
     @Size(min = 8, max = 255)
     private String password;
 
-    @NotBlank
+    // 買い手のみ必須（Controllerで手動バリデーション）。売り手は店舗名をdisplayNameとして使うため未入力でよい。
     @Size(max = 50)
     private String displayName;
 
@@ -39,8 +37,4 @@ public class SignupForm {
     private String address;
 
     private String pickupNote;
-
-    private BigDecimal latitude;
-
-    private BigDecimal longitude;
 }

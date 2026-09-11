@@ -175,8 +175,6 @@ public class SellerController {
         Shop shop = currentShop(principal);
         shop.setShopName(form.getShopName());
         shop.setAddress(form.getAddress());
-        shop.setLatitude(form.getLatitude());
-        shop.setLongitude(form.getLongitude());
         shop.setPickupNote(form.getPickupNote());
         shopRepository.save(shop);
 

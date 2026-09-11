@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,11 +54,8 @@ class SignupServiceTest {
         form.setRole(UserRole.SELLER);
         form.setEmail("seller@example.com");
         form.setPassword("password123");
-        form.setDisplayName("テスト店主");
         form.setShopName("大地の恵み 八百屋");
         form.setAddress("東京都世田谷区1-1-1");
-        form.setLatitude(new BigDecimal("35.646100"));
-        form.setLongitude(new BigDecimal("139.653400"));
         form.setPickupNote("世田谷駅北口から徒歩3分");
         return form;
     }
@@ -98,9 +94,8 @@ class SignupServiceTest {
         assertEquals(savedUser, savedShop.getUser());
         assertEquals("大地の恵み 八百屋", savedShop.getShopName());
         assertEquals("東京都世田谷区1-1-1", savedShop.getAddress());
-        assertEquals(new BigDecimal("35.646100"), savedShop.getLatitude());
-        assertEquals(new BigDecimal("139.653400"), savedShop.getLongitude());
         assertEquals("世田谷駅北口から徒歩3分", savedShop.getPickupNote());
+        assertEquals("大地の恵み 八百屋", savedUser.getDisplayName());
     }
 
     @Test

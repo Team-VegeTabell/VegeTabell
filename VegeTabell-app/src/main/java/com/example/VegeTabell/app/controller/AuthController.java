@@ -41,6 +41,8 @@ public class AuthController {
 
         if (form.getRole() == UserRole.SELLER) {
             validateSellerFields(form, bindingResult);
+        } else if (!StringUtils.hasText(form.getDisplayName())) {
+            bindingResult.rejectValue("displayName", "required", "表示名を入力してください");
         }
 
         if (!bindingResult.hasErrors() && signupService.emailExists(form.getEmail())) {
@@ -65,12 +67,6 @@ public class AuthController {
         }
         if (!StringUtils.hasText(form.getPickupNote())) {
             bindingResult.rejectValue("pickupNote", "required", "受け取り場所の説明を入力してください");
-        }
-        if (form.getLatitude() == null) {
-            bindingResult.rejectValue("latitude", "required", "緯度を入力してください");
-        }
-        if (form.getLongitude() == null) {
-            bindingResult.rejectValue("longitude", "required", "経度を入力してください");
         }
     }
 }
