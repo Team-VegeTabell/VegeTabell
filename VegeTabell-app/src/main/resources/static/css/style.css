@@ -1,15 +1,15 @@
 /* VegeTabell 共通ベーススタイル（design/wireframes/login-signup.png準拠） */
 
 :root {
-  --color-bg: #ffffff;
+  --color-bg: #eae6df;
   --color-text: #1a1a1a;
   --color-muted: #8a8a8a;
   --color-border: #e0e0e0;
   --color-field-bg: #f5f5f5;
   --color-pill-bg: #eeeeee;
   --color-pill-selected-bg: #e0e0e0;
-  --color-button-bg: #e5e5e5;
-  --color-button-text: #1a1a1a;
+  --color-button-bg: #2e7d32;
+  --color-button-text: #ffffff;
   --color-error: #c0392b;
   --color-success: #2e7d32;
 }
@@ -89,8 +89,8 @@ body {
 }
 
 .role-toggle input[type="radio"]:checked + label {
-  background: var(--color-pill-selected-bg);
-  color: var(--color-text);
+  background: var(--color-success);
+  color: var(--color-button-text);
 }
 
 .field {
@@ -455,6 +455,7 @@ body {
 }
 
 .btn-fab-disabled {
+  background: var(--color-pill-bg);
   color: var(--color-muted);
   cursor: not-allowed;
 }
@@ -519,8 +520,8 @@ body {
 }
 
 .category-pill-selected {
-  background: var(--color-pill-selected-bg);
-  color: var(--color-text);
+  background: var(--color-success);
+  color: var(--color-button-text);
 }
 
 .buyer-product-list {
