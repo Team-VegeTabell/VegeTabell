@@ -6,7 +6,8 @@ public enum NotificationType {
     NEW_PRODUCT_NEARBY("new_product_nearby"),
     RESERVATION_CANCELED("reservation_canceled"),
     NEW_RESERVATION("new_reservation"),
-    STOCK_EXPIRING_WARNING("stock_expiring_warning");
+    STOCK_EXPIRING_WARNING("stock_expiring_warning"),
+    PICKUP_COMPLETED("pickup_completed");
 
     private final String value;
 

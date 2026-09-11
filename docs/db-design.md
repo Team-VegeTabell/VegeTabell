@@ -1,13 +1,7 @@
 # DB設計
 
 VegeTabell（フードロス削減マッチングアプリ）のデータベース設計案。
-DB：Supabase（PostgreSQL）を想定。
-
-## 設計方針
-
-- 各テーブルの主キー(id)は **BIGSERIAL**（連番の数値）で統一する
-- タイムスタンプは **TIMESTAMPTZ** を使用する
-- ステータス等の区分値は、PostgreSQLのENUM型ではなく `VARCHAR + CHECK制約` で統一する（後から選択肢を追加しやすいため）
+DB：Supabase（PostgreSQL
 
 ## テーブル一覧
 
@@ -129,6 +123,7 @@ DB：Supabase（PostgreSQL）を想定。
 | reservation_canceled | 買い手・売り手 | 予約キャンセル |
 | new_reservation | 売り手 | 新規予約 |
 | stock_expiring_warning | 売り手 | 売れ残り・期限間近の警告 |
+| pickup_completed | 売り手 | 買い手が受け取り完了ボタンを押した |
 
 ### 通知が生成されるタイミング（実装フェーズで詳細化）
 
@@ -136,11 +131,7 @@ DB：Supabase（PostgreSQL）を想定。
 - `pickup_reminder`：受取開始時刻の一定時間前にバッチ処理で生成
 - `new_product_nearby`：商品登録時に、範囲内（`notification_radius_m`）の買い手を検索して生成
 - `stock_expiring_warning`：期限が近い（例：2時間前）かつ在庫ありの商品を定期チェックして生成
+- `pickup_completed`：買い手が予約詳細画面で受け取り完了操作をした時に生成（`pickup_end_at`超過によるバッチ自動完了時は生成しない）
 
 ---
 
-## 未確定・今後の検討事項
-
-- 距離表示：リアルタイム計算か簡易固定値か
-- 在庫の同時予約制御（複数買い手が同時予約した場合の整合性）
-- 緯度経度を使った近傍検索は、件数が増えた場合PostGIS等の導入も検討

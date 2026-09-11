@@ -123,6 +123,29 @@ class ReservationServiceTest {
     }
 
     @Test
+    void complete_marksReservationCompletedAndNotifiesSeller() {
+        Product product = product(1);
+        User buyer = buyer(9L);
+        Reservation reservation = new Reservation();
+        reservation.setProduct(product);
+        reservation.setBuyer(buyer);
+        reservation.setQuantity(1);
+        reservation.setStatus(ReservationStatus.RESERVED);
+
+        reservationService.complete(reservation);
+
+        assertEquals(ReservationStatus.COMPLETED, reservation.getStatus());
+        verify(reservationRepository).save(reservation);
+
+        ArgumentCaptor<User> recipientCaptor = ArgumentCaptor.forClass(User.class);
+        ArgumentCaptor<NotificationType> typeCaptor = ArgumentCaptor.forClass(NotificationType.class);
+        verify(notificationService)
+                .create(recipientCaptor.capture(), typeCaptor.capture(), any(), any(), any(), any());
+        assertEquals(NotificationType.PICKUP_COMPLETED, typeCaptor.getValue());
+        assertEquals(product.getShop().getUser(), recipientCaptor.getValue());
+    }
+
+    @Test
     void cancel_restoresStockAndReopensSoldOutProduct() {
         Product product = product(0);
         product.setStatus(ProductStatus.SOLD_OUT);
