@@ -27,6 +27,12 @@
         </div>
 
         <div class="field">
+            <label for="description">商品説明（任意）</label>
+            <textarea id="description" th:field="*{description}" rows="3"></textarea>
+            <p class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+        </div>
+
+        <div class="field">
             <label for="categoryId">カテゴリー</label>
             <select id="categoryId" th:field="*{categoryId}">
                 <option value="">選択してください</option>

@@ -20,6 +20,8 @@ public class ProductForm {
     @Size(max = 100)
     private String name;
 
+    private String description;
+
     @NotNull
     private Long categoryId;
 
