@@ -121,6 +121,7 @@ public class SellerController {
         product.setShop(shop);
         product.setCategory(category);
         product.setName(form.getName());
+        product.setDescription(StringUtils.hasText(form.getDescription()) ? form.getDescription() : null);
         product.setImageUrl(StringUtils.hasText(form.getImageUrl()) ? form.getImageUrl() : null);
         product.setNormalPrice(form.getNormalPrice());
         product.setRescuePrice(form.getRescuePrice());
