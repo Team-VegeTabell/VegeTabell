@@ -109,6 +109,7 @@ body {
 .field input[type="email"],
 .field input[type="password"],
 .field input[type="number"],
+.field input[type="datetime-local"],
 .field textarea {
   width: 100%;
   padding: 14px 16px;
@@ -116,6 +117,8 @@ body {
   border-radius: 12px;
   background: var(--color-input-bg);
   font-size: 15px;
+  font-family: inherit;
+  color: var(--color-text);
 }
 
 .field-error {
