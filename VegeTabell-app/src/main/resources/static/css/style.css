@@ -6,6 +6,7 @@
   --color-muted: #8a8a8a;
   --color-border: #e0e0e0;
   --color-field-bg: #f5f5f5;
+  --color-input-bg: #ffffff;
   --color-pill-bg: #eeeeee;
   --color-pill-selected-bg: #e0e0e0;
   --color-button-bg: #2e7d32;
@@ -113,7 +114,7 @@ body {
   padding: 14px 16px;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--color-bg);
+  background: var(--color-input-bg);
   font-size: 15px;
 }
 
@@ -429,7 +430,7 @@ body {
   padding: 14px 16px;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--color-bg);
+  background: var(--color-input-bg);
   font-size: 15px;
 }
 
