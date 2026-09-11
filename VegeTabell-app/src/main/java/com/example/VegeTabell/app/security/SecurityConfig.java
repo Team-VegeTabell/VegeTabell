@@ -30,7 +30,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/signup", "/error",
-                        "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                        "/css/**", "/js/**", "/images/**", "/webjars/**", "/uploads/**").permitAll()
                 // /reservations/{id}/cancel のみ買い手・売り手どちらもアクセスしうるため、
                 // ロールでの制御ではなくコントローラー側の所有者チェックに委ねる（auth-design.md §2の補足に対応）。
                 // より広い /reservations/** のBUYER限定ルールより先に評価させる必要がある。

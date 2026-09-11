@@ -13,11 +13,20 @@
         <h1 class="page-title">新しく出品する</h1>
     </div>
 
-    <form th:action="@{/seller/products}" th:object="${productForm}" method="post">
+    <p class="auth-message error" th:if="${uploadError != null}" th:text="${uploadError}"></p>
+
+    <form th:action="@{/seller/products}" th:object="${productForm}" method="post" enctype="multipart/form-data">
         <div class="field">
-            <label for="imageUrl">商品の写真URL（任意）</label>
-            <input type="text" id="imageUrl" th:field="*{imageUrl}" placeholder="https://...">
-            <p class="field-error" th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}"></p>
+            <label class="photo-upload" for="photo">
+                <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp,image/gif"
+                       onchange="previewPhoto(event)">
+                <span class="photo-upload-placeholder" id="photoUploadPlaceholder">
+                    <svg th:replace="~{fragments/icons :: icon('camera')}"></svg>
+                    <span>商品の写真を撮影・アップロード</span>
+                </span>
+                <img id="photoPreview" class="photo-upload-preview" alt="" hidden>
+            </label>
+            <p class="field-error" th:if="${#fields.hasErrors('photo')}" th:errors="*{photo}"></p>
         </div>
 
         <div class="field">
@@ -71,6 +80,7 @@
         <button type="submit" class="btn-primary" data-loading-text="出品中...">出品する</button>
     </form>
 </div>
+<script th:src="@{/js/photo-preview.js}"></script>
 <script th:src="@{/js/form-lock.js}"></script>
 </body>
 </html>
