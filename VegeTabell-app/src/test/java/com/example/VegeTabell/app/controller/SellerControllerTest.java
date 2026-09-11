@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
+@TestPropertySource(properties = "app.upload.dir=build/test-uploads")
 class SellerControllerTest {
 
     @Autowired
@@ -210,16 +212,18 @@ class SellerControllerTest {
     }
 
     @Test
-    void postProduct_invalidImageUrl_reRendersWithFieldError() throws Exception {
+    void postProduct_invalidPhotoType_reRendersWithFieldError() throws Exception {
         when(categoryRepository.findAllByOrderById()).thenReturn(List.of(vegetableCategory()));
 
         String futureExpiry = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES).toString();
+        org.springframework.mock.web.MockMultipartFile photo =
+                new org.springframework.mock.web.MockMultipartFile("photo", "note.txt", "text/plain", "not an image".getBytes());
 
-        mockMvc.perform(post("/seller/products")
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/seller/products")
+                        .file(photo)
                         .with(user(sellerPrincipal(1L)))
                         .param("name", "ほうれん草バラ売り")
                         .param("categoryId", "1")
-                        .param("imageUrl", "not-a-url")
                         .param("normalPrice", "200")
                         .param("rescuePrice", "80")
                         .param("totalQuantity", "3")
@@ -227,9 +231,38 @@ class SellerControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("seller/product-form"))
-                .andExpect(model().attributeHasFieldErrors("productForm", "imageUrl"));
+                .andExpect(model().attributeHasFieldErrors("productForm", "photo"));
 
         verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void postProduct_withPhoto_storesFileAndSetsImageUrl() throws Exception {
+        Shop shop = shopOwnedBySeller(10L, 1L);
+        when(shopRepository.findByUserId(1L)).thenReturn(Optional.of(shop));
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(vegetableCategory()));
+
+        String futureExpiry = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES).toString();
+        org.springframework.mock.web.MockMultipartFile photo =
+                new org.springframework.mock.web.MockMultipartFile("photo", "spinach.png", "image/png", "fake-image-bytes".getBytes());
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/seller/products")
+                        .file(photo)
+                        .with(user(sellerPrincipal(1L)))
+                        .param("name", "ほうれん草バラ売り")
+                        .param("categoryId", "1")
+                        .param("normalPrice", "200")
+                        .param("rescuePrice", "80")
+                        .param("totalQuantity", "3")
+                        .param("expiryAt", futureExpiry)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/seller/products"));
+
+        verify(productRepository).save(org.mockito.ArgumentMatchers.argThat(product ->
+                product.getImageUrl() != null
+                        && product.getImageUrl().startsWith("/uploads/")
+                        && product.getImageUrl().endsWith(".png")));
     }
 
     @Test

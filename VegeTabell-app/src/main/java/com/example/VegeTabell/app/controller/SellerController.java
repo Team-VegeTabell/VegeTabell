@@ -14,6 +14,7 @@ import com.example.VegeTabell.app.repository.ProductRepository;
 import com.example.VegeTabell.app.repository.ReservationRepository;
 import com.example.VegeTabell.app.repository.ShopRepository;
 import com.example.VegeTabell.app.security.CustomUserDetails;
+import com.example.VegeTabell.app.service.FileStorageService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,11 +22,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -42,17 +46,28 @@ public class SellerController {
     private final CategoryRepository categoryRepository;
     private final ReservationRepository reservationRepository;
     private final NotificationRepository notificationRepository;
+    private final FileStorageService fileStorageService;
 
     public SellerController(ShopRepository shopRepository,
                              ProductRepository productRepository,
                              CategoryRepository categoryRepository,
                              ReservationRepository reservationRepository,
-                             NotificationRepository notificationRepository) {
+                             NotificationRepository notificationRepository,
+                             FileStorageService fileStorageService) {
         this.shopRepository = shopRepository;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.reservationRepository = reservationRepository;
         this.notificationRepository = notificationRepository;
+        this.fileStorageService = fileStorageService;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public String handleUploadTooLarge(Model model) {
+        model.addAttribute("productForm", new ProductForm());
+        model.addAttribute("categories", categoryRepository.findAllByOrderById());
+        model.addAttribute("uploadError", "写真のファイルサイズが大きすぎます（5MB以下にしてください）");
+        return "seller/product-form";
     }
 
     @GetMapping("/dashboard")
@@ -110,6 +125,12 @@ public class SellerController {
             }
         }
 
+        MultipartFile photo = form.getPhoto();
+        boolean hasPhoto = photo != null && !photo.isEmpty();
+        if (hasPhoto && !fileStorageService.isSupportedImage(photo)) {
+            bindingResult.rejectValue("photo", "invalidType", "対応していない画像形式です（jpg・png・webp・gifのみ）");
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", categoryRepository.findAllByOrderById());
             return "seller/product-form";
@@ -122,7 +143,7 @@ public class SellerController {
         product.setCategory(category);
         product.setName(form.getName());
         product.setDescription(StringUtils.hasText(form.getDescription()) ? form.getDescription() : null);
-        product.setImageUrl(StringUtils.hasText(form.getImageUrl()) ? form.getImageUrl() : null);
+        product.setImageUrl(hasPhoto ? fileStorageService.store(photo) : null);
         product.setNormalPrice(form.getNormalPrice());
         product.setRescuePrice(form.getRescuePrice());
         product.setTotalQuantity(form.getTotalQuantity());

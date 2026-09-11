@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+uploads/
 
 ### 個人のDB接続情報（Supabaseパスワード等）はコミットしない ###
 application-local.properties
